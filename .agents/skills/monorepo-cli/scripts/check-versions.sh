@@ -14,16 +14,19 @@ fi
 
 # All projects to check (both embedded and submodules)
 PROJECTS=(
+    "Advance-Commerce-CLI"
     "App-StoreKit-CLI"
     "Apple-Business-Connect-CLI"
     "Apple-Map-Server-CLI"
     "cimis-cli"
+    "cli-installer-toolkit"
     "Google-Drive-CLI"
     "Google-Play-Developer-CLI"
     "grokipedia-cli"
     "Local-UniFi-CLI"
     "MyMarketNews-CLI"
     "UniFi-Site-Manager-CLI"
+    "UPS-CLI"
     "go-cli-template"
     "Skills"
     "X-CLI"

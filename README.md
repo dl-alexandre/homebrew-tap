@@ -4,9 +4,11 @@ This repository contains CLI tools as submodules.
 
 ## Submodules
 
+- Advance-Commerce-CLI
 - App-StoreKit-CLI
 - Apple-Business-Connect-CLI
 - Apple-Map-Server-CLI
+- cli-installer-toolkit
 - Google-Drive-CLI
 - Google-Play-Developer-CLI
 - Local-UniFi-CLI

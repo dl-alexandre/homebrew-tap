@@ -15,14 +15,17 @@ This skill provides scripts to monitor and manage all CLI projects in the monore
 - **homebrew-tap** - Homebrew formulas (submodule)
 
 ### Embedded Git Repositories
+- **Advance-Commerce-CLI** - Advance Commerce API
 - **App-StoreKit-CLI** - App Store Kit API
 - **Apple-Business-Connect-CLI** - Apple Business Connect
 - **Apple-Map-Server-CLI** - Apple Maps Server API
+- **cli-installer-toolkit** - CLI installer utilities
 - **Google-Drive-CLI** - Google Drive API
 - **Google-Play-Developer-CLI** - Google Play Publishing
 - **Local-UniFi-CLI** - Local UniFi controller
 - **MyMarketNews-CLI** - USDA Market News
 - **UniFi-Site-Manager-CLI** - UniFi Site Manager
+- **UPS-CLI** - UPS API integration
 - **cimis-cli** - California Irrigation Management
 - **grokipedia-cli** - Wikipedia/Grok integration
 - **go-cli-template** - Go CLI template

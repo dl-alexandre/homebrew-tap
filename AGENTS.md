@@ -214,6 +214,18 @@ git commit -m "message"
 git push
 ```
 
+### Monorepo Guidelines
+
+**NO FORKS OR ARCHIVED**: This monorepo contains only original, active CLI projects. Forked repositories and archived projects should NOT be added as submodules. If you need to track a fork, document it in comments but keep it separate.
+
+**Adding New CLI Projects**:
+```bash
+# Only add original, active projects (never forks or archived)
+git submodule add https://github.com/dl-alexandre/PROJECT-NAME.git PROJECT-NAME
+# Update README.md and .agents skills accordingly
+git add README.md .gitmodules
+```
+
 ## Go Version
 
 All projects use **Go 1.24.0** (specified in go.mod)
