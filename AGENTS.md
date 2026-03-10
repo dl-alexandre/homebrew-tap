@@ -216,6 +216,11 @@ git push
 
 ### Monorepo Guidelines
 
+**Versioning Rules:**
+- **Patch versions only (0.0.x)**: Unless explicitly requested, only bump the patch version for fixes and updates
+- **Minor versions (0.x.0)**: Only bump when explicitly asked by the user
+- **Major versions (x.0.0)**: Reserved for breaking changes, requires explicit user approval
+
 **NO FORKS OR ARCHIVED**: This monorepo contains only original, active CLI projects. Forked repositories and archived projects should NOT be added as submodules. If you need to track a fork, document it in comments but keep it separate.
 
 **Adding New CLI Projects**:
