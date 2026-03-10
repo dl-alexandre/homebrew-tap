@@ -13,6 +13,7 @@ This repository contains CLI tools as submodules.
 - MyMarketNews-CLI
 - Skills
 - UniFi-Site-Manager-CLI
+- UPS-CLI
 - X-CLI
 
 ## Getting Started

@@ -4,3 +4,6 @@
 [submodule "Skills"]
 	path = Skills
 	url = https://github.com/dl-alexandre/Skills.git
+[submodule "UPS-CLI"]
+	path = UPS-CLI
+	url = https://github.com/dl-alexandre/UPS-CLI.git
