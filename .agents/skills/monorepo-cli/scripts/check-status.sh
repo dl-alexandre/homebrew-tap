@@ -9,25 +9,26 @@ ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$ROOT_DIR"
 
 # Configuration
+TOOLS_DIR="${ROOT_DIR}/Tools"
 EMBEDDED_REPOS=(
-    "Advance-Commerce-CLI"
-    "App-StoreKit-CLI"
-    "Apple-Business-Connect-CLI"
-    "Apple-Map-Server-CLI"
-    "cimis-cli"
-    "cli-template"
-    "Google-Drive-CLI"
-    "Google-Play-Developer-CLI"
-    "Grokipedia-CLI"
-    "Local-UniFi-CLI"
-    "MyMarketNews-CLI"
-    "UniFi-Site-Manager-CLI"
-    "UPS-CLI"
+    "${TOOLS_DIR}/Advance-Commerce-CLI"
+    "${TOOLS_DIR}/App-StoreKit-CLI"
+    "${TOOLS_DIR}/Apple-Business-Connect-CLI"
+    "${TOOLS_DIR}/Apple-Map-Server-CLI"
+    "${TOOLS_DIR}/cimis-cli"
+    "${TOOLS_DIR}/cli-template"
+    "${TOOLS_DIR}/Google-Drive-CLI"
+    "${TOOLS_DIR}/Google-Play-Developer-CLI"
+    "${TOOLS_DIR}/Grokipedia-CLI"
+    "${TOOLS_DIR}/Local-UniFi-CLI"
+    "${TOOLS_DIR}/MyMarketNews-CLI"
+    "${TOOLS_DIR}/UniFi-Site-Manager-CLI"
+    "${TOOLS_DIR}/UPS-CLI"
 )
 
 SUBMODULES=(
     "Skills"
-    "X-CLI"
+    "${TOOLS_DIR}/X-CLI"
     "homebrew-tap"
 )
 

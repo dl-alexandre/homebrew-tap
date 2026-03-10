@@ -13,6 +13,7 @@ if [ "${1:-}" = "--json" ]; then
 fi
 
 # All projects to check (both embedded and submodules)
+TOOLS_DIR="${ROOT_DIR}/Tools"
 PROJECTS=(
     "Advance-Commerce-CLI"
     "App-StoreKit-CLI"
@@ -35,15 +36,22 @@ PROJECTS=(
 json_results=()
 
 for project in "${PROJECTS[@]}"; do
-    if [ ! -d "$project" ]; then
+    # Determine full path
+    if [ "$project" = "Skills" ] || [ "$project" = "homebrew-tap" ]; then
+        full_path="${ROOT_DIR}/${project}"
+    else
+        full_path="${TOOLS_DIR}/${project}"
+    fi
+    
+    if [ ! -d "$full_path" ]; then
         continue
     fi
     
     version="unknown"
     source="none"
     
-    if [ -d "$project/.git" ]; then
-        cd "$project"
+    if [ -d "$full_path/.git" ]; then
+        cd "$full_path"
         
         # Try git describe for version
         version=$(git describe --tags --always 2>/dev/null || echo "unknown")
@@ -74,11 +82,11 @@ for project in "${PROJECTS[@]}"; do
     
     # Check if it's a submodule and get info from superrepo
     is_submodule=false
-    if [ -f ".gitmodules" ] && grep -q "path = $project" .gitmodules 2>/dev/null; then
+    if [ -f ".gitmodules" ] && grep -q "path = .*${project}" .gitmodules 2>/dev/null; then
         is_submodule=true
         if [ "$version" = "unknown" ] || [[ "$version" == *"g"* ]]; then
             # Try to get the commit from superrepo tracking
-            super_commit=$(git ls-tree HEAD "$project" 2>/dev/null | awk '{print $3}' | cut -c1-7 || echo "")
+            super_commit=$(git ls-tree HEAD "$full_path" 2>/dev/null | awk '{print $3}' | cut -c1-7 || echo "")
             if [ -n "$super_commit" ]; then
                 version="$super_commit"
                 source="superrepo"

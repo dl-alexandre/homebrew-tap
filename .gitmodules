@@ -1,12 +1,12 @@
 [submodule "X-CLI"]
-	path = X-CLI
+	path = Tools/X-CLI
 	url = https://github.com/dl-alexandre/X-CLI.git
 [submodule "Skills"]
 	path = Skills
 	url = https://github.com/dl-alexandre/Skills.git
 [submodule "UPS-CLI"]
-	path = UPS-CLI
+	path = Tools/UPS-CLI
 	url = https://github.com/dl-alexandre/UPS-CLI.git
 [submodule "Advance-Commerce-CLI"]
-	path = Advance-Commerce-CLI
+	path = Tools/Advance-Commerce-CLI
 	url = https://github.com/dl-alexandre/Advance-Commerce-CLI.git

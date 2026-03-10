@@ -7,6 +7,22 @@ description: Monorepo management tools for CLI-Tools workspace. Use when checkin
 
 This skill provides scripts to monitor and manage all CLI projects in the monorepo - including GitHub repos, local embedded repos, and submodules.
 
+## Directory Structure
+
+All CLI tools are organized in the `Tools/` directory:
+
+```
+CLI-Tools/
+├── Tools/                  # All CLI projects
+│   ├── Advance-Commerce-CLI
+│   ├── App-StoreKit-CLI
+│   ├── Apple-Business-Connect-CLI
+│   ├── ... (13 total CLI projects)
+├── Skills/                 # Agent skills documentation (submodule)
+├── homebrew-tap/           # Homebrew formulas (submodule)
+└── .agents/               # Monorepo management scripts
+```
+
 ## Repository Types
 
 ### GitHub Repos (External)
