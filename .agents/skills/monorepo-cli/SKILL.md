@@ -17,17 +17,17 @@ This skill provides scripts to monitor and manage all CLI projects in the monore
 ### Embedded Git Repositories
 - **Advance-Commerce-CLI** - Advance Commerce API
 - **App-StoreKit-CLI** - App Store Kit API
-- **Apple-business-Connect-CLI** - Apple Business Connect
+- **Apple-Business-Connect-CLI** - Apple Business Connect
 - **Apple-Map-Server-CLI** - Apple Maps Server API
+- **cli-template** - Go CLI template
 - **Google-Drive-CLI** - Google Drive API
 - **Google-Play-Developer-CLI** - Google Play Publishing
+- **Grokipedia-CLI** - Wikipedia/Grok integration
 - **Local-UniFi-CLI** - Local UniFi controller
 - **MyMarketNews-CLI** - USDA Market News
 - **UniFi-Site-Manager-CLI** - UniFi Site Manager
 - **UPS-CLI** - UPS API integration
 - **cimis-cli** - California Irrigation Management
-- **grokipedia-cli** - Wikipedia/Grok integration
-- **go-cli-template** - Go CLI template
 
 ### Submodules
 - **Skills** - CLI skills documentation

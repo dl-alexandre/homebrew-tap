@@ -8,14 +8,18 @@ This repository contains CLI tools as submodules.
 - App-StoreKit-CLI
 - Apple-Business-Connect-CLI
 - Apple-Map-Server-CLI
+- cli-template
+- cimis-cli
 - Google-Drive-CLI
 - Google-Play-Developer-CLI
+- Grokipedia-CLI
 - Local-UniFi-CLI
 - MyMarketNews-CLI
 - Skills
 - UniFi-Site-Manager-CLI
 - UPS-CLI
 - X-CLI
+- homebrew-tap
 
 ## Getting Started
 

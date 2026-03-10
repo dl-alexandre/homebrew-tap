@@ -15,14 +15,14 @@ EMBEDDED_REPOS=(
     "Apple-Business-Connect-CLI"
     "Apple-Map-Server-CLI"
     "cimis-cli"
+    "cli-template"
     "Google-Drive-CLI"
     "Google-Play-Developer-CLI"
-    "grokipedia-cli"
+    "Grokipedia-CLI"
     "Local-UniFi-CLI"
     "MyMarketNews-CLI"
     "UniFi-Site-Manager-CLI"
     "UPS-CLI"
-    "go-cli-template"
 )
 
 SUBMODULES=(
