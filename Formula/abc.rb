@@ -1,7 +1,7 @@
 class Abc < Formula
   desc "CLI for Apple Business Connect API - manage business presence on Apple Maps"
   homepage "https://github.com/dl-alexandre/Apple-Business-Connect-CLI"
-  version "v0.0.1"
+  version "v0.0.2"
   license "MIT"
 
   on_macos do

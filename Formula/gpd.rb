@@ -5,7 +5,7 @@
 class Gpd < Formula
   desc "Google Play Developer CLI - fast, lightweight CLI for Google Play Console"
   homepage "https://github.com/dl-alexandre/gpd"
-  version "0.4.6"
+  version "v0.6.0"
   license "MIT"
 
   on_macos do

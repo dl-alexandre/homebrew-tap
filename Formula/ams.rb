@@ -1,7 +1,7 @@
 class Ams < Formula
   desc "Apple Maps Server API CLI for location services"
   homepage "https://github.com/dl-alexandre/Apple-Map-Server-CLI"
-  version "v0.0.7"
+  version "v0.0.2"
   license "MIT"
 
   on_macos do
