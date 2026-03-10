@@ -1,0 +1,6 @@
+[submodule "X-CLI"]
+	path = X-CLI
+	url = https://github.com/dl-alexandre/X-CLI.git
+[submodule "Skills"]
+	path = Skills
+	url = https://github.com/dl-alexandre/Skills.git
