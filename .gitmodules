@@ -7,9 +7,6 @@
 [submodule "UPS-CLI"]
 	path = UPS-CLI
 	url = https://github.com/dl-alexandre/UPS-CLI.git
-[submodule "cli-installer-toolkit"]
-	path = cli-installer-toolkit
-	url = https://github.com/dl-alexandre/cli-installer-toolkit.git
 [submodule "Advance-Commerce-CLI"]
 	path = Advance-Commerce-CLI
 	url = https://github.com/dl-alexandre/Advance-Commerce-CLI.git

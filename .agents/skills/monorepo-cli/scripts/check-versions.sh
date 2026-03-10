@@ -19,7 +19,6 @@ PROJECTS=(
     "Apple-Business-Connect-CLI"
     "Apple-Map-Server-CLI"
     "cimis-cli"
-    "cli-installer-toolkit"
     "Google-Drive-CLI"
     "Google-Play-Developer-CLI"
     "grokipedia-cli"

@@ -17,9 +17,8 @@ This skill provides scripts to monitor and manage all CLI projects in the monore
 ### Embedded Git Repositories
 - **Advance-Commerce-CLI** - Advance Commerce API
 - **App-StoreKit-CLI** - App Store Kit API
-- **Apple-Business-Connect-CLI** - Apple Business Connect
+- **Apple-business-Connect-CLI** - Apple Business Connect
 - **Apple-Map-Server-CLI** - Apple Maps Server API
-- **cli-installer-toolkit** - CLI installer utilities
 - **Google-Drive-CLI** - Google Drive API
 - **Google-Play-Developer-CLI** - Google Play Publishing
 - **Local-UniFi-CLI** - Local UniFi controller
