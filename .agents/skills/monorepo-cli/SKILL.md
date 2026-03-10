@@ -99,6 +99,18 @@ Check if submodules are synced and up to date.
 
 **Output:** Submodule path, current commit, expected commit, sync status
 
+### check-tap-versions.sh
+Check if homebrew formulas match the latest GitHub releases.
+
+```bash
+# Check all formulas against latest releases
+./.agents/skills/monorepo-cli/scripts/check-tap-versions.sh
+
+# Shows outdated formulas with current vs latest versions
+```
+
+**Output:** Formula name, current version, latest release, SHA256 status
+
 ### monorepo-status.sh
 Full dashboard combining all checks.
 
