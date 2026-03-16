@@ -5,7 +5,7 @@
 class Mpr < Formula
   desc "CLI for USDA AMS MyMarketNews Datamart API"
   homepage "https://github.com/dl-alexandre/MyMarketNews-CLI"
-  version "0.0.7"
+  version "v0.0.7"
   license "MIT"
 
   on_macos do
