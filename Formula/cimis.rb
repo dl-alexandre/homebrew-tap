@@ -5,7 +5,7 @@
 class Cimis < Formula
   desc "CLI for California Irrigation Management Information System (CIMIS) weather data"
   homepage "https://github.com/dl-alexandre/cimis-cli"
-  version "0.0.10"
+  version "v0.0.10"
   license "MIT"
 
   on_macos do
