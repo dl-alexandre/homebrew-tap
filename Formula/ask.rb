@@ -5,7 +5,7 @@
 class Ask < Formula
   desc "CLI for the App Store Server API"
   homepage "https://github.com/dl-alexandre/App-StoreKit-CLI"
-  version "0.0.8"
+  version "v0.0.8"
   license "MIT"
 
   on_macos do
