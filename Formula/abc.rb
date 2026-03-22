@@ -1,28 +1,28 @@
 class Abc < Formula
   desc "CLI for Apple Business Connect API - manage business presence on Apple Maps"
   homepage "https://github.com/dl-alexandre/Apple-Business-Connect-CLI"
-  version "v0.0.5"
+  version "v0.0.14"
   license "MIT"
 
   on_macos do
     if Hardware::CPU.arm?
       url "https://github.com/dl-alexandre/Apple-Business-Connect-CLI/releases/download/v0.0.4/abc-darwin-arm64.tar.gz"
-      sha256 "68ded0424067733cebc2946e94c9dcc961007b7b5fd611191523b0ab584ff6c2"
+      sha256 "ce1b9820a5cfa44c1cbea596b6a45c2025c9dd9bd07be37b5be0d250de9aefb9"
     end
     if Hardware::CPU.intel?
       url "https://github.com/dl-alexandre/Apple-Business-Connect-CLI/releases/download/v0.0.4/abc-darwin-amd64.tar.gz"
-      sha256 "0d4bb22fe714ce8646c0fe1c26c3a4642fc75f6798ea8d5643df734ffd7ee810"
+      sha256 "1cd6eae16e11e4ef6b005435059996d7c37877812dbf24ace37648cd36ee901d"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
       url "https://github.com/dl-alexandre/Apple-Business-Connect-CLI/releases/download/v0.0.4/abc-linux-arm64.tar.gz"
-      sha256 "d6c97205217929ceaf4eb77c2a2f14eadf29203cfd38b4f798e6a281696ccebe"
+      sha256 "13951c071b20fec4ee036189e169db6243b072a16c281ac00867e4f51a7f515c"
     end
     if Hardware::CPU.intel?
       url "https://github.com/dl-alexandre/Apple-Business-Connect-CLI/releases/download/v0.0.4/abc-linux-amd64.tar.gz"
-      sha256 "369539508d9d8e6ab4fbb4b61c9e82eba5f42759447257c3e861cd287a72a1ab"
+      sha256 "cd798fafb7fe3a14c262585f60da88b49cb955715ace2dc553894bbdaeecade8"
     end
   end
 
