@@ -5,7 +5,7 @@
 class Gdrv < Formula
   desc "Fast, lightweight CLI for Google Drive"
   homepage "https://github.com/dl-alexandre/Google-Drive-CLI"
-  version "0.6.4"
+  version "v0.6.4"
   license "MIT"
 
   on_macos do
