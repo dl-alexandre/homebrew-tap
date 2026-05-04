@@ -34,6 +34,11 @@ This tap uses a Ruby-based GitHub Actions workflow to:
 - Create Pull Requests with updated formulas
 - Test formulas on both macOS and Linux before merging
 
+Dependency and submodule maintenance are handled with:
+- `scripts/refresh-dependencies.sh` to normalize Go workflow setup, refresh every Go module, tidy module files, and run tests.
+- `scripts/check-submodule-pointers.sh` to compare parent gitlinks with the branch configured in `.gitmodules`; pass `--update` to fast-forward and stage pointer changes.
+- Dependabot grouping for GitHub Actions, Go modules, and parent `gitsubmodule` updates to reduce single-package PR noise.
+
 ## Development
 
 ### GoReleaser Configuration

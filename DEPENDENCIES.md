@@ -89,9 +89,9 @@ These are pulled in automatically by direct dependencies. No need to star unless
 ## Action Items
 
 ### Immediate
-1. **Update chromedp** - v0.14.2 → v0.16.1 (breaking changes possible)
-2. **Update rodaine/table** - v1.3.0 → v1.3.1 (safe update)
-3. **Review utls** - Do we still need TLS fingerprinting?
+1. Keep Dependabot grouped for Go modules and GitHub Actions across CLI repos.
+2. Run `scripts/refresh-dependencies.sh` for manual all-repo dependency refreshes.
+3. Run `scripts/check-submodule-pointers.sh --update` after child repo updates merge, then commit the staged parent gitlinks.
 
 ### Consolidation Candidates (Deferred)
 After review, we decided **NOT** to consolidate these libraries:
@@ -123,6 +123,7 @@ After audit, star these high-impact repos:
 
 ## Changelog
 
+- **2026-05-04** - Added grouped Dependabot configs for Go modules, GitHub Actions, and parent submodule updates; normalized Go CI workflows to read from `go.mod`; added maintenance scripts for dependency refreshes and submodule pointer checks.
 - **2026-03-30** - Attempted kong and viper updates but reverted:
   - Local-UniFi-CLI: kong v1.10.0 → v1.14.0 and viper v1.20.1 → v1.21.0 (reverted due to missing go.sum entries)
   - X-CLI: viper v1.19.0 → v1.21.0 (reverted due to missing go.sum entries)

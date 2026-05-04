@@ -1,54 +1,72 @@
 [submodule "homebrew-tap"]
 	path = homebrew-tap
 	url = https://github.com/dl-alexandre/homebrew-tap.git
+	branch = master
 [submodule "scoop-bucket"]
 	path = scoop-bucket
 	url = https://github.com/dl-alexandre/scoop-bucket.git
+	branch = main
 [submodule "cli-tools"]
 	path = cli-tools
 	url = https://github.com/dl-alexandre/cli-tools.git
+	branch = master
 [submodule "Skills"]
 	path = Skills
 	url = https://github.com/dl-alexandre/Skills.git
+	branch = master
 [submodule "Tools/Advance-Commerce-CLI"]
 	path = Tools/Advance-Commerce-CLI
 	url = https://github.com/dl-alexandre/Advance-Commerce-CLI.git
+	branch = master
 [submodule "Tools/App-StoreKit-CLI"]
 	path = Tools/App-StoreKit-CLI
 	url = https://github.com/dl-alexandre/App-StoreKit-CLI.git
+	branch = master
 [submodule "Tools/Apple-Business-Connect-CLI"]
 	path = Tools/Apple-Business-Connect-CLI
 	url = https://github.com/dl-alexandre/Apple-Business-Connect-CLI.git
+	branch = master
 [submodule "Tools/Apple-Map-Server-CLI"]
 	path = Tools/Apple-Map-Server-CLI
 	url = https://github.com/dl-alexandre/Apple-Map-Server-CLI.git
+	branch = master
 [submodule "Tools/Google-Drive-CLI"]
 	path = Tools/Google-Drive-CLI
 	url = https://github.com/dl-alexandre/Google-Drive-CLI.git
+	branch = master
 [submodule "Tools/Google-Play-Developer-CLI"]
 	path = Tools/Google-Play-Developer-CLI
 	url = https://github.com/dl-alexandre/Google-Play-Developer-CLI.git
+	branch = master
 [submodule "Tools/Grokipedia-CLI"]
 	path = Tools/Grokipedia-CLI
 	url = https://github.com/dl-alexandre/Grokipedia-CLI.git
+	branch = master
 [submodule "Tools/Local-UniFi-CLI"]
 	path = Tools/Local-UniFi-CLI
 	url = https://github.com/dl-alexandre/Local-UniFi-CLI.git
+	branch = master
 [submodule "Tools/MyMarketNews-CLI"]
 	path = Tools/MyMarketNews-CLI
 	url = https://github.com/dl-alexandre/MyMarketNews-CLI.git
+	branch = master
 [submodule "Tools/UPS-CLI"]
 	path = Tools/UPS-CLI
 	url = https://github.com/dl-alexandre/UPS-CLI.git
+	branch = master
 [submodule "Tools/UniFi-Site-Manager-CLI"]
 	path = Tools/UniFi-Site-Manager-CLI
 	url = https://github.com/dl-alexandre/UniFi-Site-Manager-CLI.git
+	branch = master
 [submodule "Tools/X-CLI"]
 	path = Tools/X-CLI
 	url = https://github.com/dl-alexandre/X-CLI.git
+	branch = master
 [submodule "Tools/cimis-cli"]
 	path = Tools/cimis-cli
 	url = https://github.com/dl-alexandre/cimis-cli.git
+	branch = master
 [submodule "Tools/cli-template"]
 	path = Tools/cli-template
 	url = https://github.com/dl-alexandre/cli-template.git
+	branch = master
