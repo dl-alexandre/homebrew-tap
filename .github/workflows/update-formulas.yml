@@ -19,7 +19,7 @@ jobs:
       pr_created: ${{ steps.update.outputs.pr_created }}
     steps:
     - name: Checkout tap repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         # TAP_TOKEN requires repo scope and workflow permissions to create pull requests
         # Generate at: https://github.com/settings/tokens with 'repo' and 'workflow' scopes
@@ -212,7 +212,7 @@ jobs:
         os: [macos-latest, ubuntu-latest]
     steps:
     - name: Checkout tap repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
