@@ -108,3 +108,50 @@ jobs:
         done
 
         echo "Done checking ${{ matrix.repo }}"
+
+  cleanup-releases:
+    name: Delete stale draft releases
+    runs-on: ubuntu-latest
+    needs: cleanup-tool-repos
+    if: always()
+    strategy:
+      matrix:
+        repo:
+          - dl-alexandre/Advance-Commerce-CLI
+          - dl-alexandre/App-StoreKit-CLI
+          - dl-alexandre/Apple-Business-Connect-CLI
+          - dl-alexandre/Apple-Map-Server-CLI
+          - dl-alexandre/cimis-cli
+          - dl-alexandre/cli-template
+          - dl-alexandre/Google-Drive-CLI
+          - dl-alexandre/Google-Play-Developer-CLI
+          - dl-alexandre/Grokipedia-CLI
+          - dl-alexandre/Local-UniFi-CLI
+          - dl-alexandre/MyMarketNews-CLI
+          - dl-alexandre/UniFi-Site-Manager-CLI
+          - dl-alexandre/UPS-CLI
+          - dl-alexandre/X-CLI
+    steps:
+    - name: Delete stale draft releases in ${{ matrix.repo }}
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "Checking ${{ matrix.repo }} for stale draft releases..."
+
+        releases_json=$(gh release list --repo ${{ matrix.repo }} --limit 50 --json tagName,isDraft,isLatest 2>/dev/null || echo '[]')
+
+        latest_tag=$(echo "$releases_json" | jq -r '.[] | select(.isLatest) | .tagName')
+        stale_drafts=$(echo "$releases_json" | jq -r --arg latest "$latest_tag" '.[] | select(.isDraft and .tagName != $latest) | .tagName')
+
+        if [ -z "$stale_drafts" ]; then
+          echo "  No stale drafts found"
+          exit 0
+        fi
+
+        deleted=0
+        for tag in $stale_drafts; do
+          echo "  Deleting stale draft: $tag"
+          gh release delete "$tag" --repo ${{ matrix.repo }} --yes 2>/dev/null && deleted=$((deleted + 1)) || echo "  Failed to delete $tag"
+        done
+
+        echo "Cleanup complete: $deleted draft release(s) deleted"

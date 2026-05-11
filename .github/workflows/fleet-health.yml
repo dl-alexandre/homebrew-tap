@@ -1,0 +1,47 @@
+name: Fleet Health
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+
+  # Run weekly on Mondays at 09:00 UTC
+  schedule:
+    - cron: '0 9 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  ci-health:
+    name: Check CI Health
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout scripts
+      uses: actions/checkout@v6
+      with:
+        sparse-checkout: |
+          scripts/
+        sparse-checkout-cone-mode: false
+
+    - name: Check for failed CI runs in the last 7 days
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/check-ci-health.sh --days 7 --failed-only
+
+  release-audit:
+    name: Audit Releases
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout scripts
+      uses: actions/checkout@v6
+      with:
+        sparse-checkout: |
+          scripts/
+        sparse-checkout-cone-mode: false
+
+    - name: Check for stale drafts and release anomalies
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/check-releases.sh
