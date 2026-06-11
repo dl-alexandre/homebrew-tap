@@ -13,7 +13,7 @@ class Ams < Formula
       url "https://github.com/dl-alexandre/Apple-Map-Server-CLI/releases/download/v0.0.12/ams-darwin-amd64.tar.gz"
       sha256 "f17def6f6558b54e020208a7c77b7d71de9a432706635a314ed06e7927eb4d6d"
 
-      def install
+      define_method(:install) do
         bin.install "ams"
       end
     end
@@ -21,7 +21,7 @@ class Ams < Formula
       url "https://github.com/dl-alexandre/Apple-Map-Server-CLI/releases/download/v0.0.12/ams-darwin-arm64.tar.gz"
       sha256 "b6c44d0961261c84bd3bd9ac45eb758c09e35205f3c7643f26f2592787d5719e"
 
-      def install
+      define_method(:install) do
         bin.install "ams"
       end
     end
@@ -31,14 +31,14 @@ class Ams < Formula
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
       url "https://github.com/dl-alexandre/Apple-Map-Server-CLI/releases/download/v0.0.12/ams-linux-amd64.tar.gz"
       sha256 "1f996abf1f8f500926b17da9a3b5f1c2b0bd9b2b3b387be56ab952de38840523"
-      def install
+      define_method(:install) do
         bin.install "ams"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
       url "https://github.com/dl-alexandre/Apple-Map-Server-CLI/releases/download/v0.0.12/ams-linux-arm64.tar.gz"
       sha256 "c6d2caeb31aeeef90ad99173e46db94e186e5c499df42647f0cb670fffde7f35"
-      def install
+      define_method(:install) do
         bin.install "ams"
       end
     end

@@ -45,3 +45,33 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         ./scripts/check-releases.sh
+
+  formula-coverage:
+    name: Check Formula Coverage
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+      with:
+        sparse-checkout: |
+          .gitmodules
+          Formula/
+          scripts/
+        sparse-checkout-cone-mode: false
+
+    - name: Verify every tool has a formula
+      run: |
+        ./scripts/check-formula-coverage.sh
+
+  template-drift:
+    name: Check Template Drift
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository with tool submodules
+      uses: actions/checkout@v6
+      with:
+        submodules: true
+
+    - name: Verify tools match the cli-template baseline
+      run: |
+        ./scripts/check-template-drift.sh

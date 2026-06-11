@@ -26,11 +26,6 @@ while read -r key path; do
   branch="$(git -C "$ROOT" config -f .gitmodules --get "submodule.$name.branch" || true)"
   branch="${branch:-master}"
 
-  if [[ "$path" == "homebrew-tap" ]]; then
-    echo "skip     $path -> self-referential workspace submodule"
-    continue
-  fi
-
   recorded="$(git -C "$ROOT" rev-parse ":$path" 2>/dev/null || git -C "$ROOT" rev-parse "HEAD:$path")"
   if git -C "$ROOT/$path" rev-parse --git-dir >/dev/null 2>&1; then
     git -C "$ROOT/$path" fetch -q origin "$branch"
