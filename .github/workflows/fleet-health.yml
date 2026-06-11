@@ -71,6 +71,8 @@ jobs:
       uses: actions/checkout@v6
       with:
         submodules: true
+        # Some tool repos are private; the default GITHUB_TOKEN cannot clone them.
+        token: ${{ secrets.TAP_TOKEN }}
 
     - name: Verify tools match the cli-template baseline
       run: |
