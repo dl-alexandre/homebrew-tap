@@ -5,13 +5,13 @@
 class XCli < Formula
   desc "Terminal-first CLI for X with AI-friendly outputs"
   homepage "https://github.com/dl-alexandre/X-CLI"
-  version "0.0.4"
+  version "v0.0.3"
   license "MIT"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/dl-alexandre/X-CLI/releases/download/v0.0.4/x_Darwin_x86_64.tar.gz"
-      sha256 "02ec1a680eea6ae8ec4610f826e28d252123c104fe9fc46240cc654322a630fa"
+      url "https://github.com/dl-alexandre/X-CLI/releases/download/v0.0.3/x_Darwin_x86_64.tar.gz"
+      sha256 "0cb4c94294cc6bf8540cb93696e795811db4e6195f5dfe619df731a6c94c4e9c"
 
       define_method(:install) do
         bin.install "x"
@@ -21,8 +21,8 @@ class XCli < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/dl-alexandre/X-CLI/releases/download/v0.0.4/x_Darwin_arm64.tar.gz"
-      sha256 "3cc2c2529b43f3b12df909227d2ae362f57d0c3129248f385158ac3208e53041"
+      url "https://github.com/dl-alexandre/X-CLI/releases/download/v0.0.3/x_Darwin_arm64.tar.gz"
+      sha256 "4cbb19bbf8cbbbd807d072ba36783c9d09862bacd5f09c7a240e8be3e368d365"
 
       define_method(:install) do
         bin.install "x"
@@ -35,8 +35,8 @@ class XCli < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://github.com/dl-alexandre/X-CLI/releases/download/v0.0.4/x_Linux_x86_64.tar.gz"
-      sha256 "d4bd350eabf00a413766e8e3ee600284f1f2125f816354996976ae29fad7d51e"
+      url "https://github.com/dl-alexandre/X-CLI/releases/download/v0.0.3/x_Linux_x86_64.tar.gz"
+      sha256 "380e7b3f47eb405c043108f41afe13ed373ee872771124f28c45fffecba4104e"
       define_method(:install) do
         bin.install "x"
         bash_completion.install "completions/x.bash" => "x"
@@ -45,8 +45,8 @@ class XCli < Formula
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/dl-alexandre/X-CLI/releases/download/v0.0.4/x_Linux_arm64.tar.gz"
-      sha256 "4f03fab758adf3137ae861cb82c079f6cd06dc9bd7ffe28c7380538b2a2417eb"
+      url "https://github.com/dl-alexandre/X-CLI/releases/download/v0.0.3/x_Linux_arm64.tar.gz"
+      sha256 "fc5c73efe951c826a95b3395db95f7b59c58576d9fc5744aee83f89702d35e86"
       define_method(:install) do
         bin.install "x"
         bash_completion.install "completions/x.bash" => "x"
