@@ -108,6 +108,8 @@ jobs:
         git config --global user.name "GitHub Actions"
 
     - name: Discover and test formulas
+      env:
+        GH_TOKEN: ${{ secrets.TAP_TOKEN }}
       run: |
         # Add local tap for testing
         brew tap-new local/tap
@@ -119,7 +121,13 @@ jobs:
         # Test each discovered formula
         for formula in $FORMULAS; do
           echo "Testing $formula..."
-          brew install local/tap/$formula || true
+          repo=$(ruby -ne 'puts Regexp.last_match(1) if /homepage "https:\/\/github\.com\/([^"]+)"/' "Formula/$formula.rb")
+          if [ -n "$repo" ] && [ "$(gh repo view "$repo" --json isPrivate --jq .isPrivate 2>/dev/null || echo false)" = "true" ]; then
+            echo "Skipping $formula because $repo is private and the formula uses a plain release URL"
+            continue
+          fi
+
+          brew install local/tap/$formula
           if command -v $formula &> /dev/null; then
             if ! $formula --version; then
               $formula version
