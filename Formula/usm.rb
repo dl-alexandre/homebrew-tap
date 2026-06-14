@@ -5,21 +5,21 @@
 class Usm < Formula
   desc "Full-featured CLI for managing UniFi networks via Site Manager API"
   homepage "https://github.com/dl-alexandre/UniFi-Site-Manager-CLI"
-  version "v1.1.2"
+  version "1.1.6"
   license "MIT"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/dl-alexandre/UniFi-Site-Manager-CLI/releases/download/v1.1.2/usm-darwin-amd64.tar.gz"
-      sha256 "89861f5d4eb1bb689ad44b682432b6c7df61164e03a0bae3873c4f34280b8963"
+      url "https://github.com/dl-alexandre/UniFi-Site-Manager-CLI/releases/download/v1.1.6/usm-darwin-amd64.tar.gz"
+      sha256 "c3efbe78f3eab13ce894c10628e0e208ee0a82a6f46655303206a2d7ed0a752f"
 
       define_method(:install) do
         bin.install "usm"
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/dl-alexandre/UniFi-Site-Manager-CLI/releases/download/v1.1.2/usm-darwin-arm64.tar.gz"
-      sha256 "e058e773313ae59a7e863ba408df67c2f8588ca79c376238caa1a02a242875be"
+      url "https://github.com/dl-alexandre/UniFi-Site-Manager-CLI/releases/download/v1.1.6/usm-darwin-arm64.tar.gz"
+      sha256 "ae556cb8068ca2b6ec8fa798bb57138fba7a2c3eca5c2f9bec6849eea26ae77c"
 
       define_method(:install) do
         bin.install "usm"
@@ -29,15 +29,15 @@ class Usm < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://github.com/dl-alexandre/UniFi-Site-Manager-CLI/releases/download/v1.1.2/usm-linux-amd64.tar.gz"
-      sha256 "5a0a764c4e9674456e01bd0dd6bfd3099bcbf90b72a0629909924dce62e7a798"
+      url "https://github.com/dl-alexandre/UniFi-Site-Manager-CLI/releases/download/v1.1.6/usm-linux-amd64.tar.gz"
+      sha256 "4dd0d5bc3c3a256c4f54e48b8f73829ec9aa5629d76f97325244533a4b8afc15"
       define_method(:install) do
         bin.install "usm"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/dl-alexandre/UniFi-Site-Manager-CLI/releases/download/v1.1.2/usm-linux-arm64.tar.gz"
-      sha256 "942b671ed5e84c4015e1f4b3af59fed7b6644a5e92fa0b0fb172b64c1cd6ce4e"
+      url "https://github.com/dl-alexandre/UniFi-Site-Manager-CLI/releases/download/v1.1.6/usm-linux-arm64.tar.gz"
+      sha256 "66f7da5552f9ef2f1bb181904efaa7dad2713de20ae4c4755dae9abbfa990770"
       define_method(:install) do
         bin.install "usm"
       end
