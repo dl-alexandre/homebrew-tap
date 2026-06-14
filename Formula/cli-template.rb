@@ -5,21 +5,21 @@
 class CliTemplate < Formula
   desc "Production-ready Go CLI template with Kong, Viper, caching, and GoReleaser"
   homepage "https://github.com/dl-alexandre/cli-template"
-  version "v1.1.2"
+  version "v1.1.3"
   license "MIT"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/dl-alexandre/cli-template/releases/download/v1.1.2/cli-template_Darwin_x86_64.tar.gz"
-      sha256 "c2be2988f93fc7139f588ee17725b6b0b92e5d30979d17037de84b563ac07e7b"
+      url "https://github.com/dl-alexandre/cli-template/releases/download/v1.1.3/cli-template_Darwin_x86_64.tar.gz"
+      sha256 "689a236452c8a03cc49ce69121d3085a7e0861f38a672e470c57579325b06d4f"
 
       define_method(:install) do
         bin.install "cli-template"
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/dl-alexandre/cli-template/releases/download/v1.1.2/cli-template_Darwin_arm64.tar.gz"
-      sha256 "0f19971a4340c4e0d9b0d00ec9542d95624c3b8d46846af5d727c01363ea7bc0"
+      url "https://github.com/dl-alexandre/cli-template/releases/download/v1.1.3/cli-template_Darwin_arm64.tar.gz"
+      sha256 "7ea5e24ccdee35b47bc97ee25c2f3d78ecebbc837772f11a9a77b2017fd5b584"
 
       define_method(:install) do
         bin.install "cli-template"
@@ -29,15 +29,15 @@ class CliTemplate < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://github.com/dl-alexandre/cli-template/releases/download/v1.1.2/cli-template_Linux_x86_64.tar.gz"
-      sha256 "5a10bdb13b2fb078297da6083f17f6d8fa7ca7e9602600c5ce78b3370444f7cb"
+      url "https://github.com/dl-alexandre/cli-template/releases/download/v1.1.3/cli-template_Linux_x86_64.tar.gz"
+      sha256 "ca159910824ad8b3144de11aa0c01fe704b68fcaebe732a9d0f8379330f8b579"
       define_method(:install) do
         bin.install "cli-template"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/dl-alexandre/cli-template/releases/download/v1.1.2/cli-template_Linux_arm64.tar.gz"
-      sha256 "96a6544b8b0e4b8dcaa3ce467848dc111c15aeb7e91c1fff8f3e278afe56464a"
+      url "https://github.com/dl-alexandre/cli-template/releases/download/v1.1.3/cli-template_Linux_arm64.tar.gz"
+      sha256 "68799e60a2ae9aedc7873522ed07ddff887236d1b46f96ab4392ad71bc7e4c5a"
       define_method(:install) do
         bin.install "cli-template"
       end
