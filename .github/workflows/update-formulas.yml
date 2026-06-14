@@ -111,7 +111,12 @@ jobs:
     - name: Discover and test formulas
       env:
         GH_TOKEN: ${{ secrets.TAP_TOKEN }}
+        TEST_REF: ${{ needs.update-formulas.outputs.branch_name || github.ref }}
       run: |
+        git fetch origin "$TEST_REF"
+        git checkout --force FETCH_HEAD
+        git log -1 --oneline
+
         # Add local tap for testing
         brew tap-new local/tap
         cp Formula/*.rb "$(brew --repo local/tap)/Formula/"
