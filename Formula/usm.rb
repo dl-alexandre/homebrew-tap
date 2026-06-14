@@ -45,6 +45,6 @@ class Usm < Formula
   end
 
   test do
-    system "#{bin}/usm", "version"
+    system "#{bin}/usm", "--help"
   end
 end
