@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       pr_created: ${{ steps.update.outputs.pr_created }}
+      branch_name: ${{ steps.update.outputs.branch_name }}
     steps:
     - name: Checkout tap repository
       uses: actions/checkout@v6
@@ -97,7 +98,7 @@ jobs:
     - name: Checkout tap repository
       uses: actions/checkout@v6
       with:
-        ref: ${{ github.event.pull_request.head.ref || github.ref }}
+        ref: ${{ needs.update-formulas.outputs.branch_name || github.ref }}
 
     - name: Set up Homebrew
       uses: Homebrew/actions/setup-homebrew@main
