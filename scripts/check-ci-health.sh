@@ -45,23 +45,25 @@ echo ""
 FAILURES=0
 
 for repo in "${REPOS[@]}"; do
-  # Get workflows and their latest run
-  runs_json="$(gh run list --repo "$OWNER/$repo" --limit 20 --created ">$(date -u -v-${DAYS}d +%Y-%m-%d 2>/dev/null || date -u -d "${DAYS} days ago" +%Y-%m-%d)" --json name,status,conclusion,event,createdAt,headBranch,url 2>/dev/null || true)"
+  # Get recent runs and inspect only the latest run for each workflow. Historical
+  # failures are useful for debugging, but they should not keep fleet health red
+  # after a newer run has passed.
+  runs_json="$(gh run list --repo "$OWNER/$repo" --limit 20 --created ">$(date -u -v-${DAYS}d +%Y-%m-%d 2>/dev/null || date -u -d "${DAYS} days ago" +%Y-%m-%d)" --json workflowName,status,conclusion,event,createdAt,headBranch,url 2>/dev/null || true)"
 
   if [[ -z "$runs_json" || "$runs_json" == "[]" ]]; then
     [[ "${FAILED_ONLY:-}" == "1" ]] || echo "    $repo  — no recent runs"
     continue
   fi
 
-  # Check for any failures
-  failed_count="$(echo "$runs_json" | jq '[.[] | select(.conclusion == "failure")] | length')"
+  latest_runs="$(echo "$runs_json" | jq '[group_by(.workflowName)[] | max_by(.createdAt)]')"
+  failed_count="$(echo "$latest_runs" | jq '[.[] | select(.conclusion == "failure")] | length')"
 
   if [[ "$failed_count" -gt 0 ]]; then
-    echo "❌ $repo  ($failed_count failed run(s))"
-    echo "$runs_json" | jq -r '.[] | select(.conclusion == "failure") | "   \(.createdAt) \(.event) \(.name)"' | head -5
+    echo "❌ $repo  ($failed_count workflow(s) currently failing)"
+    echo "$latest_runs" | jq -r '.[] | select(.conclusion == "failure") | "   \(.createdAt) \(.event) \(.workflowName)"' | head -5
     FAILURES=$((FAILURES + 1))
   else
-    [[ "${FAILED_ONLY:-}" == "1" ]] || echo "✅ $repo  — all recent runs passed"
+    [[ "${FAILED_ONLY:-}" == "1" ]] || echo "✅ $repo  — latest runs passed"
   fi
 done
 

@@ -121,7 +121,9 @@ jobs:
           echo "Testing $formula..."
           brew install local/tap/$formula || true
           if command -v $formula &> /dev/null; then
-            $formula --version
+            if ! $formula --version; then
+              $formula version
+            fi
             brew uninstall local/tap/$formula || true
           fi
         done
