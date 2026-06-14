@@ -128,11 +128,7 @@ jobs:
           fi
 
           brew install local/tap/$formula
-          if command -v $formula &> /dev/null; then
-            if ! $formula --version; then
-              $formula version
-            fi
-            brew uninstall local/tap/$formula || true
-          fi
+          brew test local/tap/$formula
+          brew uninstall local/tap/$formula || true
         done
       working-directory: ${{ github.workspace }}
