@@ -5,7 +5,7 @@
 class Grokipedia < Formula
   desc "Grokipedia CLI - command-line interface for the Grokipedia API"
   homepage "https://github.com/dl-alexandre/Grokipedia-CLI"
-  version "0.0.5"
+  version "v0.0.5"
   license "MIT"
 
   on_macos do
