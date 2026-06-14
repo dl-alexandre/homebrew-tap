@@ -45,6 +45,6 @@ class Ask < Formula
   end
 
   test do
-    system "#{bin}/ask", "version"
+    system "#{bin}/ask", "--help"
   end
 end
