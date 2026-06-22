@@ -46,6 +46,8 @@ done < <(
 
 TOTAL_STALE=0
 TOTAL_ANOMALY=0
+TOTAL_DUPLICATE=0
+TOTAL_MISSING_LATEST=0
 
 delete_release() {
   local repo="$1" tag="$2"
@@ -57,7 +59,7 @@ delete_release() {
 }
 
 for repo in "${REPOS[@]}"; do
-  releases_json="$(gh release list --repo "$OWNER/$repo" --limit 50 --json tagName,isDraft,isLatest,publishedAt 2>/dev/null || true)"
+  releases_json="$(gh release list --repo "$OWNER/$repo" --limit 50 --json tagName,isDraft,isPrerelease,isLatest,publishedAt 2>/dev/null || true)"
 
   if [[ -z "$releases_json" || "$releases_json" == "[]" ]]; then
     echo "    $repo  — no releases"
@@ -65,6 +67,11 @@ for repo in "${REPOS[@]}"; do
   fi
 
   latest_tag="$(echo "$releases_json" | jq -r '.[] | select(.isLatest) | .tagName')"
+  stable_release_count="$(echo "$releases_json" | jq '[.[] | select((.isDraft | not) and (.isPrerelease | not))] | length')"
+  missing_latest=0
+  if [[ -z "$latest_tag" && "$stable_release_count" -gt 0 ]]; then
+    missing_latest=1
+  fi
   stale_count="$(echo "$releases_json" | jq --arg latest "$latest_tag" '[.[] | select(.isDraft and .tagName != $latest)] | length')"
 
   # Find duplicate tags
@@ -100,16 +107,25 @@ for repo in "${REPOS[@]}"; do
   fi
 
   has_issues=0
-  if [[ "$stale_count" -gt 0 || "$dupe_count" -gt 0 || "$anomaly_count" -gt 0 ]]; then
+  if [[ "$stale_count" -gt 0 || "$dupe_count" -gt 0 || "$anomaly_count" -gt 0 || "$missing_latest" -gt 0 ]]; then
     has_issues=1
   fi
 
   if [[ "$has_issues" -eq 0 ]]; then
-    echo "✅ $repo  latest=$latest_tag  releases=$(echo "$releases_json" | jq 'length')"
+    if [[ -n "$latest_tag" ]]; then
+      echo "✅ $repo  latest=$latest_tag  releases=$(echo "$releases_json" | jq 'length')"
+    else
+      echo "✅ $repo  latest=(none; prereleases only)  releases=$(echo "$releases_json" | jq 'length')"
+    fi
     continue
   fi
 
   echo "⚠️  $repo  latest=$latest_tag"
+
+  if [[ "$missing_latest" -gt 0 ]]; then
+    echo "   Missing latest release marker"
+    TOTAL_MISSING_LATEST=$((TOTAL_MISSING_LATEST + 1))
+  fi
 
   if [[ "$stale_count" -gt 0 ]]; then
     echo "   Stale drafts ($stale_count):"
@@ -125,6 +141,7 @@ for repo in "${REPOS[@]}"; do
 
   if [[ "$dupe_count" -gt 0 ]]; then
     echo "   Duplicate tags ($dupe_count): $dupes"
+    TOTAL_DUPLICATE=$((TOTAL_DUPLICATE + dupe_count))
   fi
 
   if [[ "$anomaly_count" -gt 0 ]]; then
@@ -142,7 +159,12 @@ done
 echo ""
 if [[ "$DRY_RUN" -eq 1 ]]; then
   echo "[DRY-RUN] Would clean up $TOTAL_STALE stale drafts + $TOTAL_ANOMALY anomalies."
+  echo "Found $TOTAL_DUPLICATE duplicate tag group(s) + $TOTAL_MISSING_LATEST missing latest marker(s)."
   echo "Re-run with --cleanup to delete."
 else
-  echo "Found $TOTAL_STALE stale drafts + $TOTAL_ANOMALY anomalies."
+  echo "Found $TOTAL_STALE stale drafts + $TOTAL_DUPLICATE duplicate tag group(s) + $TOTAL_ANOMALY anomalies + $TOTAL_MISSING_LATEST missing latest marker(s)."
+fi
+
+if [[ "$TOTAL_STALE" -gt 0 || "$TOTAL_DUPLICATE" -gt 0 || "$TOTAL_ANOMALY" -gt 0 || "$TOTAL_MISSING_LATEST" -gt 0 ]]; then
+  exit 1
 fi

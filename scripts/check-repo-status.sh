@@ -35,7 +35,7 @@ echo "    $PARENT_BRANCH  ahead:$PARENT_AHEAD behind:$PARENT_BEHIND$PARENT_CHANG
 
 echo ""
 echo "==> Submodules"
-git -C "$ROOT" submodule status | while IFS= read -r line; do
+while IFS= read -r line; do
   # Parse: [ -]<sha> <path> [optional extra]
   prefix="${line:0:1}"
   rest="${line:1}"
@@ -64,7 +64,7 @@ git -C "$ROOT" submodule status | while IFS= read -r line; do
   else
     echo "    $path  $BRANCH  (no upstream)$CHANGES"
   fi
-done
+done < <(git -C "$ROOT" submodule status)
 
 if [[ "$NO_CHANGES" -eq 1 ]]; then
   echo ""

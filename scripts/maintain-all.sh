@@ -7,6 +7,7 @@ SKIP_TESTS=0
 SKIP_CI=0
 SKIP_RELEASES=0
 SKIP_SUBMODULES=0
+SKIP_REFRESH=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -14,18 +15,21 @@ while [[ $# -gt 0 ]]; do
     --skip-ci) SKIP_CI=1; shift ;;
     --skip-releases) SKIP_RELEASES=1; shift ;;
     --skip-submodules) SKIP_SUBMODULES=1; shift ;;
+    --skip-refresh|--check-only) SKIP_REFRESH=1; shift ;;
     --help|-h) cat <<'USAGE'; exit 0 ;;
 Usage: scripts/maintain-all.sh [options]
 
 Run the full maintenance suite across the workspace:
   1. Check local repo + submodule status
   2. Check submodule pointers against remotes
-  3. Refresh Go dependencies (unless --no-test)
+  3. Refresh Go dependencies (unless --skip-refresh)
   4. Check CI health across all remotes (unless --skip-ci)
   5. Audit releases for stale drafts (unless --skip-releases)
 
 Options:
   --no-test           Skip Go test suite during dependency refresh
+  --skip-refresh      Skip Go dependency refresh entirely
+  --check-only        Alias for --skip-refresh
   --skip-ci           Skip remote CI health check
   --skip-releases     Skip release audit
   --skip-submodules   Skip submodule pointer check
@@ -72,7 +76,12 @@ if [[ "$SKIP_SUBMODULES" -eq 0 ]]; then
 fi
 
 # 3. Refresh dependencies
-if [[ "$SKIP_TESTS" -eq 1 ]]; then
+if [[ "$SKIP_REFRESH" -eq 1 ]]; then
+  echo "──────────────────────────────────────────────────────────────"
+  echo "3. Dependency refresh (skipped)"
+  echo "──────────────────────────────────────────────────────────────"
+  echo "   Skipped by --skip-refresh"
+elif [[ "$SKIP_TESTS" -eq 1 ]]; then
   echo "──────────────────────────────────────────────────────────────"
   echo "3. Dependency refresh (tests skipped)"
   echo "──────────────────────────────────────────────────────────────"
