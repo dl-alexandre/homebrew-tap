@@ -20,7 +20,7 @@ jobs:
       branch_name: ${{ steps.update.outputs.branch_name }}
     steps:
     - name: Checkout tap repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         # TAP_TOKEN requires repo scope and workflow permissions to create pull requests
         # Generate at: https://github.com/settings/tokens with 'repo' and 'workflow' scopes
@@ -96,7 +96,7 @@ jobs:
         os: [macos-latest, ubuntu-latest]
     steps:
     - name: Checkout tap repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         ref: ${{ needs.update-formulas.outputs.branch_name || github.ref }}
 
