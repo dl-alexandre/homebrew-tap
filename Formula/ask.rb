@@ -5,21 +5,21 @@
 class Ask < Formula
   desc "CLI for the App Store Server API"
   homepage "https://github.com/dl-alexandre/App-StoreKit-CLI"
-  version "v0.0.8"
+  version "0.0.9"
   license "MIT"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/dl-alexandre/App-StoreKit-CLI/releases/download/v0.0.8/ask-darwin-amd64.tar.gz"
-      sha256 "a05f6fab64f65ab3ceb52c76eefe5531e18174f97ef6367311fcf79e9f9d15e3"
+      url "https://github.com/dl-alexandre/App-StoreKit-CLI/releases/download/v0.0.9/ask-darwin-amd64.tar.gz"
+      sha256 "165021f8bd89526a99aeecc2ad9b817d67c17ed1cca523fee0bf23dee7878b27"
 
       define_method(:install) do
         bin.install "ask"
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/dl-alexandre/App-StoreKit-CLI/releases/download/v0.0.8/ask-darwin-arm64.tar.gz"
-      sha256 "879754bc28c8c3dfd0e8fa6dc0d00665073496719b417ca7f78352faeb5771d4"
+      url "https://github.com/dl-alexandre/App-StoreKit-CLI/releases/download/v0.0.9/ask-darwin-arm64.tar.gz"
+      sha256 "c60e4d3e07ed1f4bae08a22b295108107ed7ef850cabe59961c2b2921d8fd8db"
 
       define_method(:install) do
         bin.install "ask"
@@ -29,15 +29,15 @@ class Ask < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://github.com/dl-alexandre/App-StoreKit-CLI/releases/download/v0.0.8/ask-linux-amd64.tar.gz"
-      sha256 "6dc2d9a24a2a11663fbd49c890f1b032f2dcb2534c41d65c60d9056677374325"
+      url "https://github.com/dl-alexandre/App-StoreKit-CLI/releases/download/v0.0.9/ask-linux-amd64.tar.gz"
+      sha256 "463e588f26df4e3ebe73a20f067f971c9434519d98f8eaf3a9d6bb0ca73234b2"
       define_method(:install) do
         bin.install "ask"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/dl-alexandre/App-StoreKit-CLI/releases/download/v0.0.8/ask-linux-arm64.tar.gz"
-      sha256 "68a4a6359185b08584df526c0da1b0fbbec66224b9d30f17393b7f5ca407f995"
+      url "https://github.com/dl-alexandre/App-StoreKit-CLI/releases/download/v0.0.9/ask-linux-arm64.tar.gz"
+      sha256 "6b91055c0617797d9b62a1be00e094300edffe717bd7cdd351b6ede1eaa96793"
       define_method(:install) do
         bin.install "ask"
       end
@@ -45,6 +45,6 @@ class Ask < Formula
   end
 
   test do
-    system "#{bin}/ask", "--help"
+    system "#{bin}/ask", "version"
   end
 end
