@@ -57,9 +57,8 @@ Dir.glob("#{formula_dir}/*.rb").sort.each do |formula_file|
         data = URI.open(url, 'Authorization' => "token #{ENV['GITHUB_TOKEN']}").read
         sha256 = Digest::SHA256.hexdigest(data)
         new_content = new_content.gsub(
-          /(#{Regexp.escape(url)}"\s+sha256 ")[^"]+/,
-          "\\1#{sha256}"
-        )
+          /(#{Regexp.escape(url)}"\s+sha256 ")[^"]+/
+        ) { "#{Regexp.last_match(1)}#{sha256}" }
         puts "  SHA256: #{sha256}"
       rescue StandardError => e
         puts "  Error: Could not download #{url}: #{e.message}"
