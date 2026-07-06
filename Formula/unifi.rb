@@ -11,7 +11,7 @@ class Unifi < Formula
   on_macos do
     if Hardware::CPU.intel?
       url "https://github.com/dl-alexandre/Local-UniFi-CLI/releases/download/v0.1.7/unifi-darwin-amd64.tar.gz"
-      sha256 "d920075402f6c517e60595ba1bf37a7861901cb4b8c05fc674b63a5467699bb5"
+      sha256 "cfda096935a8dfb9eea53532fb7a86198fe36ea3c9f0375b541753d94bd0662c"
 
       define_method(:install) do
         bin.install "unifi"
@@ -19,7 +19,7 @@ class Unifi < Formula
     end
     if Hardware::CPU.arm?
       url "https://github.com/dl-alexandre/Local-UniFi-CLI/releases/download/v0.1.7/unifi-darwin-arm64.tar.gz"
-      sha256 "be0dcc8f76c90250bbaf5c9d390f25c8ca4d1a3fad811f335d21d21097c8772b"
+      sha256 "60d460812b14c8b2f9607350c009124c7ec15c901f2e5d47a1c79bcdffd3533d"
 
       define_method(:install) do
         bin.install "unifi"
@@ -30,14 +30,14 @@ class Unifi < Formula
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
       url "https://github.com/dl-alexandre/Local-UniFi-CLI/releases/download/v0.1.7/unifi-linux-amd64.tar.gz"
-      sha256 "e0afb7819eb4bc9b00291fc12ea4ff847553fe1fa9fae73af3a546a38ac54c86"
+      sha256 "98a18ab8be0f5c383eea00802e187c312845aa05b7b45c3c4504861d8fbf53d7"
       define_method(:install) do
         bin.install "unifi"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
       url "https://github.com/dl-alexandre/Local-UniFi-CLI/releases/download/v0.1.7/unifi-linux-arm64.tar.gz"
-      sha256 "7120c2cfe4f558afcdc248fc35e586756d2827ec6bf161c4c9a3a811a7aa9dd4"
+      sha256 "59e48646aac0fdb3a222a914d7aaf2eb74b610d8815714d48bca4debcedfe75a"
       define_method(:install) do
         bin.install "unifi"
       end
