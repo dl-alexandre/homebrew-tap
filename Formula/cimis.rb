@@ -5,21 +5,21 @@
 class Cimis < Formula
   desc "CLI for California Irrigation Management Information System (CIMIS) weather data"
   homepage "https://github.com/dl-alexandre/cimis-cli"
-  version "v0.0.10"
+  version "0.1.0"
   license "MIT"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/dl-alexandre/cimis-cli/releases/download/v0.0.10/cimis-darwin-amd64.tar.gz"
-      sha256 "02479e2212d71f8afeef471845e822a1d65eb8b28e9d598bde6b72ad1748a96c"
+      url "https://github.com/dl-alexandre/cimis-cli/releases/download/v0.1.0/cimis-darwin-amd64.tar.gz"
+      sha256 "2cb086338b988521d3cfbef9bf08b82a9d5780d7694a4e72d1580110164157ac"
 
       define_method(:install) do
         bin.install "cimis"
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/dl-alexandre/cimis-cli/releases/download/v0.0.10/cimis-darwin-arm64.tar.gz"
-      sha256 "e3da565868216f794c962b951be9aa0bd14392e93f8b783a2b15a64ece3a71ab"
+      url "https://github.com/dl-alexandre/cimis-cli/releases/download/v0.1.0/cimis-darwin-arm64.tar.gz"
+      sha256 "6b3c76406050c6892b1db618a8bab9d252e48f13bffa473942192e300d30a42c"
 
       define_method(:install) do
         bin.install "cimis"
@@ -29,15 +29,15 @@ class Cimis < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://github.com/dl-alexandre/cimis-cli/releases/download/v0.0.10/cimis-linux-amd64.tar.gz"
-      sha256 "ca4d5b6c351e6d51f4e596069e241b84ecec38f16e27cc91a5aeb34b5270f810"
+      url "https://github.com/dl-alexandre/cimis-cli/releases/download/v0.1.0/cimis-linux-amd64.tar.gz"
+      sha256 "87ab8021fbd25611576c3f2531e075efb0e58b510d5b3f32cf91bc0bc515a539"
       define_method(:install) do
         bin.install "cimis"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/dl-alexandre/cimis-cli/releases/download/v0.0.10/cimis-linux-arm64.tar.gz"
-      sha256 "fbdda14e60f949ba2a36065790f59bfb460601dc7f28bebc797342d2c711c58a"
+      url "https://github.com/dl-alexandre/cimis-cli/releases/download/v0.1.0/cimis-linux-arm64.tar.gz"
+      sha256 "0b3f71f041e52b703ad22a40e10a1124a637d193ffd592678e3acb107792bc5d"
       define_method(:install) do
         bin.install "cimis"
       end
