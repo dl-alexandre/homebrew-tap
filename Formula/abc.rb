@@ -5,7 +5,7 @@
 class Abc < Formula
   desc "CLI for Apple Business Connect API"
   homepage "https://github.com/dl-alexandre/Apple-Business-Connect-CLI"
-  version "0.0.15"
+  version "v0.0.15"
   license "MIT"
 
   on_macos do
