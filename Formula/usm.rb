@@ -5,7 +5,7 @@
 class Usm < Formula
   desc "Full-featured CLI for managing UniFi networks via Site Manager API"
   homepage "https://github.com/dl-alexandre/UniFi-Site-Manager-CLI"
-  version "1.1.7"
+  version "v1.1.7"
   license "MIT"
 
   on_macos do
