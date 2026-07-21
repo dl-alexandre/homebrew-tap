@@ -5,7 +5,7 @@
 class Aca < Formula
   desc "Advanced Commerce API CLI"
   homepage "https://github.com/dl-alexandre/Advance-Commerce-CLI"
-  version "0.0.6"
+  version "v0.0.6"
   license "MIT"
 
   on_macos do
