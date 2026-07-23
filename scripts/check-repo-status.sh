@@ -29,8 +29,8 @@ else
   PARENT_CHANGES=" (uncommitted changes)"
   NO_CHANGES=0
 fi
-PARENT_AHEAD="$(git rev-list --count HEAD..@{u} 2>/dev/null || echo '?')"
-PARENT_BEHIND="$(git rev-list --count @{u}..HEAD 2>/dev/null || echo '?')"
+PARENT_AHEAD="$(git rev-list --count @{u}..HEAD 2>/dev/null || echo '?')"
+PARENT_BEHIND="$(git rev-list --count HEAD..@{u} 2>/dev/null || echo '?')"
 echo "    $PARENT_BRANCH  ahead:$PARENT_AHEAD behind:$PARENT_BEHIND$PARENT_CHANGES"
 
 echo ""
@@ -58,8 +58,8 @@ while IFS= read -r line; do
 
   UPSTREAM="$(git rev-parse --abbrev-ref HEAD@{u} 2>/dev/null || true)"
   if [[ -n "$UPSTREAM" ]]; then
-    AHEAD="$(git rev-list --count HEAD..@{u} 2>/dev/null || echo '0')"
-    BEHIND="$(git rev-list --count @{u}..HEAD 2>/dev/null || echo '0')"
+    AHEAD="$(git rev-list --count @{u}..HEAD 2>/dev/null || echo '0')"
+    BEHIND="$(git rev-list --count HEAD..@{u} 2>/dev/null || echo '0')"
     echo "    $path  $BRANCH  ahead:$AHEAD behind:$BEHIND$CHANGES"
   else
     echo "    $path  $BRANCH  (no upstream)$CHANGES"

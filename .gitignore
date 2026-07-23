@@ -1,2 +1,5 @@
 # macOS
 .DS_Store
+
+# Interrupted OpenClaw backup archives written at the workspace root
+/*-openclaw-backup.tar.gz.*.tmp
