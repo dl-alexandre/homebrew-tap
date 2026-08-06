@@ -5,7 +5,7 @@
 class Unifi < Formula
   desc "CLI for local UniFi controller management"
   homepage "https://github.com/dl-alexandre/Local-UniFi-CLI"
-  version "0.1.7"
+  version "v0.1.7"
   license "MIT"
 
   on_macos do
