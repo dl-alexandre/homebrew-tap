@@ -27,8 +27,11 @@ Dir.glob("#{formula_dir}/*.rb").sort.each do |formula_file|
   begin
     release = client.latest_release(repo)
     new_version = release.tag_name
+    # Tags are usually v1.2.3; formulas may store either form. Compare
+    # without the prefix so we do not open a daily PR that only adds "v".
+    same_version = new_version.sub(/\Av/, '') == current_version.sub(/\Av/, '')
 
-    if new_version == current_version
+    if same_version
       puts "#{formula} is up to date (#{new_version})"
       next
     end
