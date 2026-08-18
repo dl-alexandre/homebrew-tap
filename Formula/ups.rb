@@ -5,21 +5,21 @@
 class Ups < Formula
   desc "UPS CLI - Track packages and manage UPS shipments"
   homepage "https://github.com/dl-alexandre/UPS-CLI"
-  version "v0.0.6"
+  version "v0.0.7"
   license "MIT"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/dl-alexandre/UPS-CLI/releases/download/v0.0.6/ups_Darwin_x86_64.tar.gz"
-      sha256 "5408c09bb6e854c4389dfc6d32304454e018a45e8ee850ef7abcbafc49090bd0"
+      url "https://github.com/dl-alexandre/UPS-CLI/releases/download/v0.0.7/ups_Darwin_x86_64.tar.gz"
+      sha256 "2c72b152496568a9dfb82d254030025ebc669eab58aa9c254c35bf006fd71b52"
 
       define_method(:install) do
         bin.install "ups"
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/dl-alexandre/UPS-CLI/releases/download/v0.0.6/ups_Darwin_arm64.tar.gz"
-      sha256 "db2562c8102080bd44cf17a37fb1c82b87557c850154bb7433871102ed1e50c5"
+      url "https://github.com/dl-alexandre/UPS-CLI/releases/download/v0.0.7/ups_Darwin_arm64.tar.gz"
+      sha256 "4639456ec52a60bd477193eb4205cc923538b6476cf5a87d5bab51d5ee66f224"
 
       define_method(:install) do
         bin.install "ups"
@@ -29,15 +29,15 @@ class Ups < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://github.com/dl-alexandre/UPS-CLI/releases/download/v0.0.6/ups_Linux_x86_64.tar.gz"
-      sha256 "4b51dee4be44e05f6959c11465d00a396b76c8e8c8d8dd13690cd3308ad58159"
+      url "https://github.com/dl-alexandre/UPS-CLI/releases/download/v0.0.7/ups_Linux_x86_64.tar.gz"
+      sha256 "3221eccdab6e9dafdf9e43a8a47a94e5b98b221eb3cc685833ae55aac29fa494"
       define_method(:install) do
         bin.install "ups"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/dl-alexandre/UPS-CLI/releases/download/v0.0.6/ups_Linux_arm64.tar.gz"
-      sha256 "a172322991a78007964e643bae892ea4d1adf0c0b8295ed85d7682b4015b18cd"
+      url "https://github.com/dl-alexandre/UPS-CLI/releases/download/v0.0.7/ups_Linux_arm64.tar.gz"
+      sha256 "198dbd9cae5d5c8666c7bfb9610172bdf35a89fc9b739abaf6b3a878ed5895f4"
       define_method(:install) do
         bin.install "ups"
       end
