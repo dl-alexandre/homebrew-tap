@@ -45,6 +45,8 @@ class Ask < Formula
   end
 
   test do
-    system "#{bin}/ask", "version"
+    # v0.0.9 has no `version` subcommand; --help works without App Store creds.
+    # GoReleaser will restore `ask version` on the next release after that command ships.
+    system "#{bin}/ask", "--help"
   end
 end
