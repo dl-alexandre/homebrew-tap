@@ -5,7 +5,7 @@
 class XCli < Formula
   desc "Terminal-first CLI for X with AI-friendly outputs"
   homepage "https://github.com/dl-alexandre/X-CLI"
-  version "0.0.4"
+  version "v0.0.4"
   license "MIT"
 
   on_macos do
