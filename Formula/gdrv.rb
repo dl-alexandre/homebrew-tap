@@ -45,6 +45,6 @@ class Gdrv < Formula
   end
 
   test do
-    system "#{bin}/gdrv", "version"
+    system "#{bin}/gdrv", "--help"
   end
 end

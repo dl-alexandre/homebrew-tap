@@ -45,6 +45,6 @@ class Cimis < Formula
   end
 
   test do
-    system "#{bin}/cimis", "version"
+    system "#{bin}/cimis", "--help"
   end
 end

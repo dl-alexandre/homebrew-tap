@@ -45,6 +45,6 @@ class Mpr < Formula
   end
 
   test do
-    system "#{bin}/mpr", "version"
+    system "#{bin}/mpr", "--help"
   end
 end

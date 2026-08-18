@@ -45,6 +45,6 @@ class Ups < Formula
   end
 
   test do
-    system "#{bin}/ups", "version"
+    system "#{bin}/ups", "--help"
   end
 end

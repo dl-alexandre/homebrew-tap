@@ -45,6 +45,6 @@ class CliTemplate < Formula
   end
 
   test do
-    system "#{bin}/cli-template", "version"
+    system "#{bin}/cli-template", "--help"
   end
 end

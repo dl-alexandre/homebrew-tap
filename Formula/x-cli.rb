@@ -57,6 +57,6 @@ class XCli < Formula
   end
 
   test do
-    system "#{bin}/x", "version"
+    system "#{bin}/x", "--help"
   end
 end

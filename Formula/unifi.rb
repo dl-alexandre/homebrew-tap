@@ -45,6 +45,6 @@ class Unifi < Formula
   end
 
   test do
-    system "#{bin}/unifi", "version"
+    system "#{bin}/unifi", "--help"
   end
 end

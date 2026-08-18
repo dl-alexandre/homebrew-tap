@@ -45,6 +45,6 @@ class Gpd < Formula
   end
 
   test do
-    system "#{bin}/gpd", "version"
+    system "#{bin}/gpd", "--help"
   end
 end
