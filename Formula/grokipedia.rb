@@ -2,9 +2,9 @@
 # frozen_string_literal: true
 
 class Grokipedia < Formula
-  desc "Grokipedia CLI - command-line interface for the Grokipedia API"
+  desc "Unofficial command-line interface for the Grokipedia API"
   homepage "https://github.com/dl-alexandre/Grokipedia-CLI"
-  version "v0.1.2"
+  version "0.1.2"
   license "MIT"
 
   on_macos do
