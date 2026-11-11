@@ -17,7 +17,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.TAP_TOKEN }}
       run: |
         echo "Fetching branches..."
-        branches=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+        branches=$(curl --fail-with-body --silent --show-error -H "Authorization: token $GITHUB_TOKEN" \
           "https://api.github.com/repos/${{ github.repository }}/branches?per_page=100" | \
           jq -r '.[] | select(.name | startswith("update-formulas-")) | .name')
 
@@ -26,15 +26,15 @@ jobs:
 
         for branch in $branches; do
           # Check if there's an open PR for this branch
-          prs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+          prs=$(curl --fail-with-body --silent --show-error -H "Authorization: token $GITHUB_TOKEN" \
             "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository_owner }}:$branch&state=open")
           
           pr_count=$(echo "$prs" | jq 'length')
 
           if [ "$pr_count" -eq 0 ]; then
             echo "Deleting stale branch: $branch"
-            curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/git/refs/heads/$branch" || true
+            curl --fail-with-body --silent --show-error -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/git/refs/heads/$branch"
             deleted=$((deleted + 1))
           else
             echo "Keeping branch with open PR: $branch"
@@ -71,7 +71,7 @@ jobs:
         echo "Checking ${{ matrix.repo }}..."
         
         # Get all branches
-        branches=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+        branches=$(curl --fail-with-body --silent --show-error -H "Authorization: token $GITHUB_TOKEN" \
           "https://api.github.com/repos/${{ matrix.repo }}/branches?per_page=100" | \
           jq -r '.[].name')
 
@@ -82,13 +82,13 @@ jobs:
           fi
 
           # Check if there's an open PR for this branch
-          prs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+          prs=$(curl --fail-with-body --silent --show-error -H "Authorization: token $GITHUB_TOKEN" \
             "https://api.github.com/repos/${{ matrix.repo }}/pulls?head=${{ github.repository_owner }}:$branch&state=open")
           
           pr_count=$(echo "$prs" | jq 'length')
 
           # Check branch age (older than 30 days)
-          commit_date=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+          commit_date=$(curl --fail-with-body --silent --show-error -H "Authorization: token $GITHUB_TOKEN" \
             "https://api.github.com/repos/${{ matrix.repo }}/branches/$branch" | \
             jq -r '.commit.commit.committer.date')
           
@@ -102,8 +102,8 @@ jobs:
 
           if [ "$pr_count" -eq 0 ] && [ "$age_days" -gt 30 ]; then
             echo "Deleting stale branch: $branch (${age_days} days old)"
-            curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-              "https://api.github.com/repos/${{ matrix.repo }}/git/refs/heads/$branch" || true
+            curl --fail-with-body --silent --show-error -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ matrix.repo }}/git/refs/heads/$branch"
           fi
         done
 
@@ -134,11 +134,11 @@ jobs:
     steps:
     - name: Delete stale draft releases in ${{ matrix.repo }}
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.TAP_TOKEN }}
       run: |
         echo "Checking ${{ matrix.repo }} for stale draft releases..."
 
-        releases_json=$(gh release list --repo ${{ matrix.repo }} --limit 50 --json tagName,isDraft,isLatest 2>/dev/null || echo '[]')
+        releases_json=$(gh release list --repo ${{ matrix.repo }} --limit 50 --json tagName,isDraft,isLatest)
 
         latest_tag=$(echo "$releases_json" | jq -r '.[] | select(.isLatest) | .tagName')
         stale_drafts=$(echo "$releases_json" | jq -r --arg latest "$latest_tag" '.[] | select(.isDraft and .tagName != $latest) | .tagName')
@@ -151,7 +151,8 @@ jobs:
         deleted=0
         for tag in $stale_drafts; do
           echo "  Deleting stale draft: $tag"
-          gh release delete "$tag" --repo ${{ matrix.repo }} --yes 2>/dev/null && deleted=$((deleted + 1)) || echo "  Failed to delete $tag"
+          gh release delete "$tag" --repo ${{ matrix.repo }} --yes
+          deleted=$((deleted + 1))
         done
 
         echo "Cleanup complete: $deleted draft release(s) deleted"

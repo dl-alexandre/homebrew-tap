@@ -49,11 +49,12 @@ The `update-formulas` workflow auto-discovers every `Formula/*.rb` file, reads t
 
 ### Fleet maintenance
 
-- `scripts/refresh-dependencies.sh` — normalize Go workflow setup, refresh modules, tidy, and test
+- `scripts/refresh-dependencies.sh` — normalize Go workflow setup, refresh package and test dependencies, tidy, and test; report any failed step
 - `scripts/check-submodule-pointers.sh` — compare submodule gitlinks with `.gitmodules` branches (`--update` to fast-forward)
 - `scripts/check-formula-coverage.sh` — verify every `Tools/*` submodule has a matching formula
 - `scripts/check-template-drift.sh` — verify every tool matches the `cli-template` baseline (README, LICENSE, Makefile, CI + release workflows, GoReleaser config, golangci-lint v2 config) and flags `go.mod` Go version outliers
 - `scripts/check-ci-health.sh` / `scripts/check-releases.sh` — fleet-wide CI and release audits
+- `python3 scripts/tests/test_health_checks.py` — regression checks for health reports, including API failures and tap workflows
 - Dependabot grouping for GitHub Actions, Go modules, and submodule updates
 
 ### Fleet health CI
@@ -72,6 +73,9 @@ See [GoReleaser Configuration Guide](docs/GORELEASER_GUIDE.md) for the build con
 
 ### Token permissions
 
-The `TAP_TOKEN` secret requires:
-- `contents:write` — create branches and commit formula updates
+The `TAP_TOKEN` Actions secret must have access to this tap and every fleet repository, including private tool repositories. Use a classic token with `repo` and `workflow` scopes, or a fine-grained token with repository access and the required contents, pull requests, and Actions permissions:
+- `contents:write` — create branches, commit formula updates, and maintain releases
 - `pull_requests:write` — create pull requests with formula updates
+- `actions:read` — inspect fleet workflow runs
+
+Renew the token before it expires and replace it in this repository's Actions secrets. A `401 Bad credentials` response from scheduled jobs means it must be replaced. The health scripts report inaccessible repositories as failures.

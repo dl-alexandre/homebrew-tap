@@ -48,6 +48,7 @@ TOTAL_STALE=0
 TOTAL_ANOMALY=0
 TOTAL_DUPLICATE=0
 TOTAL_MISSING_LATEST=0
+TOTAL_ERRORS=0
 
 delete_release() {
   local repo="$1" tag="$2"
@@ -59,7 +60,11 @@ delete_release() {
 }
 
 for repo in "${REPOS[@]}"; do
-  releases_json="$(gh release list --repo "$OWNER/$repo" --limit 50 --json tagName,isDraft,isPrerelease,isLatest,publishedAt 2>/dev/null || true)"
+  if ! releases_json="$(gh release list --repo "$OWNER/$repo" --limit 50 --json tagName,isDraft,isPrerelease,isLatest,publishedAt)"; then
+    echo "❌ $repo — unable to fetch releases" >&2
+    TOTAL_ERRORS=$((TOTAL_ERRORS + 1))
+    continue
+  fi
 
   if [[ -z "$releases_json" || "$releases_json" == "[]" ]]; then
     echo "    $repo  — no releases"
@@ -165,6 +170,10 @@ else
   echo "Found $TOTAL_STALE stale drafts + $TOTAL_DUPLICATE duplicate tag group(s) + $TOTAL_ANOMALY anomalies + $TOTAL_MISSING_LATEST missing latest marker(s)."
 fi
 
-if [[ "$TOTAL_STALE" -gt 0 || "$TOTAL_DUPLICATE" -gt 0 || "$TOTAL_ANOMALY" -gt 0 || "$TOTAL_MISSING_LATEST" -gt 0 ]]; then
+if [[ "$TOTAL_ERRORS" -gt 0 ]]; then
+  echo "$TOTAL_ERRORS repository release lookup(s) failed." >&2
+fi
+
+if [[ "$TOTAL_STALE" -gt 0 || "$TOTAL_DUPLICATE" -gt 0 || "$TOTAL_ANOMALY" -gt 0 || "$TOTAL_MISSING_LATEST" -gt 0 || "$TOTAL_ERRORS" -gt 0 ]]; then
   exit 1
 fi
