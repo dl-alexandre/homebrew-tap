@@ -134,11 +134,11 @@ jobs:
     steps:
     - name: Delete stale draft releases in ${{ matrix.repo }}
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.TAP_TOKEN }}
       run: |
         echo "Checking ${{ matrix.repo }} for stale draft releases..."
 
-        releases_json=$(gh release list --repo ${{ matrix.repo }} --limit 50 --json tagName,isDraft,isLatest 2>/dev/null || echo '[]')
+        releases_json=$(gh release list --repo ${{ matrix.repo }} --limit 50 --json tagName,isDraft,isLatest)
 
         latest_tag=$(echo "$releases_json" | jq -r '.[] | select(.isLatest) | .tagName')
         stale_drafts=$(echo "$releases_json" | jq -r --arg latest "$latest_tag" '.[] | select(.isDraft and .tagName != $latest) | .tagName')
@@ -151,7 +151,8 @@ jobs:
         deleted=0
         for tag in $stale_drafts; do
           echo "  Deleting stale draft: $tag"
-          gh release delete "$tag" --repo ${{ matrix.repo }} --yes 2>/dev/null && deleted=$((deleted + 1)) || echo "  Failed to delete $tag"
+          gh release delete "$tag" --repo ${{ matrix.repo }} --yes
+          deleted=$((deleted + 1))
         done
 
         echo "Cleanup complete: $deleted draft release(s) deleted"
