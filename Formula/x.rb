@@ -1,8 +1,8 @@
 class X < Formula
   desc "Terminal-first CLI for X/Twitter with native Go transaction ID generation"
   homepage "https://github.com/dl-alexandre/X-CLI"
-  url "https://github.com/dl-alexandre/X-CLI/archive/refs/tags/v0.0.1.tar.gz"
-  sha256 "ce77e77e303d73fb0ce151c939879c2c74bed6794f81e969639682da84517ac8"
+  url "https://github.com/dl-alexandre/X-CLI/archive/refs/tags/v0.0.4.tar.gz"
+  sha256 "0375d3d35a90b5bd5b8c4f889d76e192cb6c395e78a1dd055da2c8d2cc93c53d"
   license "MIT"
 
   depends_on "go" => :build

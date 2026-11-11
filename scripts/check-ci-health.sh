@@ -29,6 +29,10 @@ done
 
 # Collect all repo names from .gitmodules (filtering to actual tool repos)
 REPOS=()
+parent_url="$(git -C "$ROOT" remote get-url origin)"
+parent_repo="${parent_url##*/}"
+parent_repo="${parent_repo%.git}"
+REPOS+=("$parent_repo")
 while IFS= read -r line; do
   url="$(echo "$line" | awk '{print $2}')"
   if echo "$url" | grep -q "github.com/$OWNER"; then
@@ -48,7 +52,11 @@ for repo in "${REPOS[@]}"; do
   # Get recent runs and inspect only the latest run for each workflow. Historical
   # failures are useful for debugging, but they should not keep fleet health red
   # after a newer run has passed.
-  runs_json="$(gh run list --repo "$OWNER/$repo" --limit 20 --created ">$(date -u -v-${DAYS}d +%Y-%m-%d 2>/dev/null || date -u -d "${DAYS} days ago" +%Y-%m-%d)" --json workflowName,status,conclusion,event,createdAt,headBranch,url 2>/dev/null || true)"
+  if ! runs_json="$(gh run list --repo "$OWNER/$repo" --limit 100 --created ">$(date -u -v-${DAYS}d +%Y-%m-%d 2>/dev/null || date -u -d "${DAYS} days ago" +%Y-%m-%d)" --json workflowName,status,conclusion,event,createdAt,headBranch,url)"; then
+    echo "❌ $repo — unable to fetch workflow runs" >&2
+    FAILURES=$((FAILURES + 1))
+    continue
+  fi
 
   if [[ -z "$runs_json" || "$runs_json" == "[]" ]]; then
     [[ "${FAILED_ONLY:-}" == "1" ]] || echo "    $repo  — no recent runs"
@@ -56,14 +64,14 @@ for repo in "${REPOS[@]}"; do
   fi
 
   latest_runs="$(echo "$runs_json" | jq '[group_by(.workflowName)[] | max_by(.createdAt)]')"
-  failed_count="$(echo "$latest_runs" | jq '[.[] | select(.conclusion == "failure")] | length')"
+  failed_count="$(echo "$latest_runs" | jq '[.[] | select(.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "action_required" or .conclusion == "startup_failure")] | length')"
 
   if [[ "$failed_count" -gt 0 ]]; then
     echo "❌ $repo  ($failed_count workflow(s) currently failing)"
-    echo "$latest_runs" | jq -r '.[] | select(.conclusion == "failure") | "   \(.createdAt) \(.event) \(.workflowName)"' | head -5
+    echo "$latest_runs" | jq -r '.[] | select(.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "action_required" or .conclusion == "startup_failure") | "   \(.createdAt) \(.event) \(.workflowName) [\(.conclusion)]\n   \(.url)"'
     FAILURES=$((FAILURES + 1))
   else
-    [[ "${FAILED_ONLY:-}" == "1" ]] || echo "✅ $repo  — latest runs passed"
+    [[ "${FAILED_ONLY:-}" == "1" ]] || echo "✅ $repo  — no failures in latest runs"
   fi
 done
 

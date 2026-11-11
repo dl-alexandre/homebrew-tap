@@ -12,7 +12,7 @@ Usage: scripts/refresh-dependencies.sh [--no-test]
 
 Refresh every Go module below this workspace:
   - normalize GitHub Actions Go setup to use go.mod
-  - run go get -u all
+  - run go get -u -t ./...
   - run go mod tidy
   - run go test ./... unless --no-test is supplied
 USAGE
@@ -29,8 +29,8 @@ while IFS= read -r gomod; do
   echo "==> $module_name"
   if ! (
     cd "$module_dir"
-    go get -u all
-    go mod tidy
+    go get -u -t ./... || exit $?
+    go mod tidy || exit $?
     if [[ "$RUN_TESTS" -eq 1 ]]; then
       go test ./...
     fi

@@ -20,12 +20,13 @@ jobs:
       uses: actions/checkout@v7
       with:
         sparse-checkout: |
+          .gitmodules
           scripts/
         sparse-checkout-cone-mode: false
 
     - name: Check for failed CI runs in the last 7 days
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.TAP_TOKEN }}
       run: |
         ./scripts/check-ci-health.sh --days 7 --failed-only
 
@@ -37,12 +38,13 @@ jobs:
       uses: actions/checkout@v7
       with:
         sparse-checkout: |
+          .gitmodules
           scripts/
         sparse-checkout-cone-mode: false
 
     - name: Check for stale drafts and release anomalies
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.TAP_TOKEN }}
       run: |
         ./scripts/check-releases.sh
 

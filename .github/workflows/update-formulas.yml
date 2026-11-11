@@ -57,31 +57,31 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.TAP_TOKEN }}
       run: |
-        curl -s -X PATCH \
+        curl --fail-with-body --silent --show-error -X PATCH \
           -H "Authorization: token $GITHUB_TOKEN" \
           -H "Accept: application/vnd.github.v3+json" \
           https://api.github.com/repos/dl-alexandre/homebrew-tap \
-          -d '{"delete_branch_on_merge":true}' || true
+          -d '{"delete_branch_on_merge":true}'
 
     - name: Delete stale update-formulas branches
       env:
         GITHUB_TOKEN: ${{ secrets.TAP_TOKEN }}
       run: |
         # Delete update-formulas-* branches whose PRs are merged or closed
-        branches=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+        branches=$(curl --fail-with-body --silent --show-error -H "Authorization: token $GITHUB_TOKEN" \
           "https://api.github.com/repos/dl-alexandre/homebrew-tap/branches?per_page=100" | \
           jq -r '.[] | select(.name | startswith("update-formulas-")) | .name')
 
         for branch in $branches; do
           # Check if there's an open PR for this branch
-          pr_state=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+          pr_state=$(curl --fail-with-body --silent --show-error -H "Authorization: token $GITHUB_TOKEN" \
             "https://api.github.com/repos/dl-alexandre/homebrew-tap/pulls?head=dl-alexandre:$branch&state=open" | \
             jq -r '.[0].state // "none"')
 
           if [ "$pr_state" != "open" ]; then
             echo "Deleting stale branch: $branch"
-            curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-              "https://api.github.com/repos/dl-alexandre/homebrew-tap/git/refs/heads/$branch" || true
+            curl --fail-with-body --silent --show-error -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/dl-alexandre/homebrew-tap/git/refs/heads/$branch"
           else
             echo "Keeping branch with open PR: $branch"
           fi
@@ -136,6 +136,6 @@ jobs:
 
           brew install local/tap/$formula
           brew test local/tap/$formula
-          brew uninstall local/tap/$formula || true
+          brew uninstall local/tap/$formula
         done
       working-directory: ${{ github.workspace }}

@@ -1,0 +1,26 @@
+name: Maintenance Checks
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Test health reports
+        run: python3 scripts/tests/test_health_checks.py
+      - name: Check shell syntax
+        run: bash -n scripts/*.sh
+      - name: Check Ruby syntax
+        run: |
+          for file in Formula/*.rb scripts/*.rb; do
+            ruby -c "$file"
+          done
+      - name: Verify formula coverage
+        run: scripts/check-formula-coverage.sh
