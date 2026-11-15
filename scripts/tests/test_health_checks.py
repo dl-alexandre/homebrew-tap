@@ -107,6 +107,38 @@ if [[ "$PWD" == */bad && "$1" == "get" ]]; then exit 42; fi
             "bad get -u -t ./...", "good get -u -t ./...",
             "good mod tidy", "good test ./..."])
 
+    def run_formula_update(self, release_behaviour):
+        stub = self.root / "rubylib"
+        stub.mkdir()
+        (stub / "octokit.rb").write_text(
+            "module Octokit\n  class Client\n    def initialize(**); end\n"
+            "    def latest_release(repo)\n" + release_behaviour + "\n    end\n  end\nend\n")
+        formulas = self.root / "Formula"
+        formulas.mkdir()
+        (formulas / "tool.rb").write_text(
+            'class Tool < Formula\n  homepage "https://github.com/dl-alexandre/tool"\n'
+            '  version "1.0.0"\nend\n')
+        output = self.root / "github-output"
+        env = dict(os.environ, FORMULA_DIR=str(formulas), GITHUB_OUTPUT=str(output),
+                   GITHUB_TOKEN="test")
+        result = subprocess.run(["ruby", "-I", str(stub), str(SCRIPTS / "update-formulas.rb")],
+                                env=env, text=True, capture_output=True, cwd=self.root)
+        return result, output.read_text()
+
+    def test_formula_lookup_failure_is_not_reported_as_up_to_date(self):
+        result, output = self.run_formula_update('      raise "401 - Bad credentials"')
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertNotIn("All formulas are up to date", result.stdout)
+        self.assertIn("Formula update lookups failed", result.stderr)
+        self.assertIn("pr_created=false", output)
+
+    def test_formula_already_current_succeeds(self):
+        result, output = self.run_formula_update(
+            '      Struct.new(:tag_name).new("v1.0.0")')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("All formulas are up to date", result.stdout)
+        self.assertIn("pr_created=false", output)
+
     @staticmethod
     def workflow_run(conclusion):
         return dict(workflowName="CI", status="completed", conclusion=conclusion,
