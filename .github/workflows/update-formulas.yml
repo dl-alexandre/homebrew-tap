@@ -12,8 +12,39 @@ on:
   repository_dispatch:
     types: [release-published]
 
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
+  preflight:
+    name: Verify TAP_TOKEN
+    runs-on: ubuntu-latest
+    # The built-in GITHUB_TOKEN keeps working when TAP_TOKEN is dead, so it is used
+    # to open/update/close the single tracking issue.
+    permissions:
+      contents: read
+      issues: write
+    steps:
+    - name: Checkout scripts
+      uses: actions/checkout@v7
+      with:
+        sparse-checkout: |
+          scripts/
+        sparse-checkout-cone-mode: false
+        persist-credentials: false
+
+    - name: Check TAP_TOKEN is accepted and not about to expire
+      env:
+        TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
+      run: python3 scripts/check-token.py --warn-days 14 --report-issue
+
   update-formulas:
+    needs: preflight
     runs-on: ubuntu-latest
     outputs:
       pr_created: ${{ steps.update.outputs.pr_created }}
@@ -48,48 +79,12 @@ jobs:
         TAP_BRANCH: master
       run: ruby scripts/update-formulas.rb
 
-  cleanup-stale-branches:
-    needs: [update-formulas, test-formulas]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-    - name: Enable auto-delete head branches on merge
-      env:
-        GITHUB_TOKEN: ${{ secrets.TAP_TOKEN }}
-      run: |
-        curl --fail-with-body --silent --show-error -X PATCH \
-          -H "Authorization: token $GITHUB_TOKEN" \
-          -H "Accept: application/vnd.github.v3+json" \
-          https://api.github.com/repos/dl-alexandre/homebrew-tap \
-          -d '{"delete_branch_on_merge":true}'
-
-    - name: Delete stale update-formulas branches
-      env:
-        GITHUB_TOKEN: ${{ secrets.TAP_TOKEN }}
-      run: |
-        # Delete update-formulas-* branches whose PRs are merged or closed
-        branches=$(curl --fail-with-body --silent --show-error -H "Authorization: token $GITHUB_TOKEN" \
-          "https://api.github.com/repos/dl-alexandre/homebrew-tap/branches?per_page=100" | \
-          jq -r '.[] | select(.name | startswith("update-formulas-")) | .name')
-
-        for branch in $branches; do
-          # Check if there's an open PR for this branch
-          pr_state=$(curl --fail-with-body --silent --show-error -H "Authorization: token $GITHUB_TOKEN" \
-            "https://api.github.com/repos/dl-alexandre/homebrew-tap/pulls?head=dl-alexandre:$branch&state=open" | \
-            jq -r '.[0].state // "none"')
-
-          if [ "$pr_state" != "open" ]; then
-            echo "Deleting stale branch: $branch"
-            curl --fail-with-body --silent --show-error -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-              "https://api.github.com/repos/dl-alexandre/homebrew-tap/git/refs/heads/$branch"
-          else
-            echo "Keeping branch with open PR: $branch"
-          fi
-        done
-
+  # Stale update-formulas-* branches are removed by cleanup-stale-branches.yml (weekly);
+  # merged ones are deleted by the repo's delete_branch_on_merge setting.
   test-formulas:
     needs: update-formulas
-    if: needs.update-formulas.outputs.pr_created == 'true'
+    # Still test a PR that was opened even if some other formula's lookup failed.
+    if: ${{ !cancelled() && needs.update-formulas.outputs.pr_created == 'true' }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
