@@ -5,7 +5,7 @@
 class Ams < Formula
   desc "Apple Map Server CLI"
   homepage "https://github.com/dl-alexandre/Apple-Map-Server-CLI"
-  version "v0.0.13"
+  version "0.0.13"
   license "MIT"
 
   on_macos do

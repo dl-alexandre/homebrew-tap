@@ -18,7 +18,8 @@ class HealthChecksTest(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         (self.root / "scripts").mkdir()
-        for name in ("check-ci-health.sh", "check-releases.sh", "refresh-dependencies.sh"):
+        for name in ("check-ci-health.sh", "check-releases.sh", "refresh-dependencies.sh",
+                     "check-scoop-parity.sh"):
             shutil.copy2(SCRIPTS / name, self.root / "scripts" / name)
         subprocess.run(["git", "init", "-q", str(self.root)], check=True)
         subprocess.run(["git", "-C", str(self.root), "remote", "add", "origin",
@@ -82,6 +83,43 @@ print(json.dumps(data))
         result = self.run_check("check-releases.sh", {})
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("no releases", result.stdout)
+
+    def setup_scoop_parity_fixture(self, formula_version="1.2.3", scoop_version="1.2.3",
+                                   add_manifest=True):
+        formula_dir = self.root / "Formula"
+        formula_dir.mkdir()
+        (formula_dir / "tool.rb").write_text(
+            'class Tool < Formula\n'
+            '  homepage "https://github.com/dl-alexandre/tool"\n'
+            f'  version "{formula_version}"\n'
+            'end\n'
+        )
+        bucket = self.root / "scoop-bucket" / "bucket"
+        bucket.mkdir(parents=True)
+        if add_manifest:
+            (bucket / "tool.json").write_text(json.dumps({
+                "version": scoop_version,
+                "homepage": "https://github.com/dl-alexandre/tool",
+            }))
+
+    def test_scoop_parity_accepts_matching_versions(self):
+        self.setup_scoop_parity_fixture()
+        result = self.run_check("check-scoop-parity.sh", {})
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("tool.json matches tool.rb at 1.2.3", result.stdout)
+
+    def test_scoop_parity_rejects_version_mismatch(self):
+        self.setup_scoop_parity_fixture(scoop_version="1.2.2")
+        result = self.run_check("check-scoop-parity.sh", {})
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("tool.json version 1.2.2 does not match tool.rb version 1.2.3",
+                      result.stdout)
+
+    def test_scoop_parity_rejects_missing_manifest(self):
+        self.setup_scoop_parity_fixture(add_manifest=False)
+        result = self.run_check("check-scoop-parity.sh", {})
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("expected one Scoop manifest", result.stdout)
 
     def test_dependency_failure_stops_that_module_and_checks_the_next(self):
         normalizer = self.root / "scripts" / "normalize-go-workflows.sh"

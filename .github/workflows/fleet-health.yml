@@ -65,6 +65,20 @@ jobs:
       run: |
         ./scripts/check-formula-coverage.sh
 
+  scoop-parity:
+    name: Check Scoop Parity
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository with packaging submodules
+      uses: actions/checkout@v7
+      with:
+        submodules: true
+        token: ${{ secrets.TAP_TOKEN }}
+
+    - name: Verify Scoop manifests match Homebrew formula versions
+      run: |
+        ./scripts/check-scoop-parity.sh
+
   template-drift:
     name: Check Template Drift
     runs-on: ubuntu-latest
