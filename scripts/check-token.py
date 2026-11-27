@@ -1,17 +1,24 @@
 #!/usr/bin/env python3
-"""check-token.py — Preflight the TAP_TOKEN secret before scheduled automation runs.
+"""check-token.py — Preflight the automation token before scheduled workflows run.
+
+The token is either a GitHub App installation token minted for this run by
+actions/create-github-app-token (TOKEN_SOURCE=app, the default once the
+TAP_APP_CLIENT_ID or TAP_APP_ID variable is set) or the legacy TAP_TOKEN personal access token
+(TOKEN_SOURCE=pat). App tokens are minted fresh each run and never need renewing, so
+the expiry handling below only applies to the PAT fallback.
 
 Makes one authenticated REST call (GET /repos/<repo>) with the token and reports:
   ok        token works and has no expiry, or expires after the warning window
   expiring  token works but expires within --warn-days (warning only, exit 0)
-  missing   the secret is empty or not set                     (exit 1)
-  invalid   GitHub rejected the token (401: expired/revoked)   (exit 1)
+  missing   the TAP_TOKEN secret is empty or not set           (exit 1)
+  invalid   GitHub rejected the token (401: expired/revoked),
+            or no app token could be minted                    (exit 1)
   no-access token authenticates but cannot read the repo       (exit 1)
   error     GitHub could not be reached or answered 5xx        (exit 1)
 
-The expiry comes from the GitHub-Authentication-Token-Expiration response header,
-which GitHub sends for personal access tokens that have an expiration date. Tokens
-without an expiry simply do not send it.
+For a PAT, the expiry comes from the GitHub-Authentication-Token-Expiration response
+header, which GitHub sends for personal access tokens that have an expiration date.
+Tokens without an expiry simply do not send it.
 
 With --report-issue, GITHUB_TOKEN (the built-in workflow token, which keeps working
 when the PAT is dead) is used to open or update one tracking issue, identified by a
@@ -21,7 +28,8 @@ healthy again. Transient "error" results never touch the issue.
 The token value is only ever sent in the Authorization header; it is never printed.
 
 Environment:
-  TAP_TOKEN           the token to check (required for a useful result)
+  TAP_TOKEN           the token to check: the minted app token or the PAT
+  TOKEN_SOURCE        "app" or "pat" (default "pat"; or --source)
   GITHUB_REPOSITORY   owner/name to probe and to file the issue in (or --repo)
   GITHUB_API_URL      API base URL (default https://api.github.com)
   GITHUB_TOKEN        token used for --report-issue
@@ -38,10 +46,22 @@ import urllib.request
 
 MARKER = "<!-- token-preflight:TAP_TOKEN -->"
 STATUS_MARKER = "<!-- token-preflight-status:{} -->"
-ISSUE_TITLE = "TAP_TOKEN needs attention: scheduled automation is at risk"
+ISSUE_TITLE = "Automation token needs attention: scheduled automation is at risk"
 NEEDS_ATTENTION = ("missing", "invalid", "no-access", "expiring")
-RENEW_HINT = ("Create a new token with access to the tap and every fleet repository, then "
-              "update the TAP_TOKEN secret under Settings > Secrets and variables > Actions.")
+SOURCES = {
+    "app": {
+        "label": "the GitHub App token",
+        "hint": ("Check the TAP_APP_CLIENT_ID (or TAP_APP_ID) variable and TAP_APP_PRIVATE_KEY secret under "
+                 "Settings > Secrets and variables > Actions, and that the GitHub App is "
+                 "installed on this tap and every fleet repository."),
+    },
+    "pat": {
+        "label": "TAP_TOKEN",
+        "hint": ("Create a new token with access to the tap and every fleet repository, then "
+                 "update the TAP_TOKEN secret under Settings > Secrets and variables > Actions. "
+                 "Better: set up the GitHub App (see README) so there is nothing to renew."),
+    },
+}
 
 
 def api(method, url, token, body=None, timeout=30):
@@ -80,34 +100,47 @@ def parse_expiry(value):
     return None
 
 
-def check(token, api_url, repo, warn_days, now):
+def check(token, api_url, repo, warn_days, now, source="pat"):
     """Return a dict describing the token's state."""
     result = {"status": "ok", "expires_at": "", "days_left": "", "detail": ""}
+    label = SOURCES[source]["label"]
     if not token:
-        result.update(status="missing", detail="The TAP_TOKEN secret is empty or not set.")
+        if source == "app":
+            result.update(status="invalid", detail=(
+                "No GitHub App installation token could be minted for this run (see the "
+                "'Mint GitHub App token' step for the reason)."))
+        else:
+            result.update(status="missing", detail="The TAP_TOKEN secret is empty or not set.")
         return result
     try:
         status, headers, payload = api("GET", f"{api_url}/repos/{repo}", token)
     except (urllib.error.URLError, OSError) as err:
-        result.update(status="error", detail=f"Could not reach GitHub to verify TAP_TOKEN: {err}")
+        result.update(status="error", detail=f"Could not reach GitHub to verify {label}: {err}")
         return result
 
     message = payload.get("message", "") if isinstance(payload, dict) else ""
     if status == 401:
+        cause = ("The app may have been suspended or uninstalled." if source == "app" else
+                 "The token has expired, been revoked, or been replaced.")
         result.update(status="invalid", detail=(
-            f"GitHub rejected TAP_TOKEN with HTTP 401 ({message or 'Bad credentials'}). "
-            "The token has expired, been revoked, or been replaced."))
+            f"GitHub rejected {label} with HTTP 401 ({message or 'Bad credentials'}). {cause}"))
         return result
     if status in (403, 404):
+        fix = ("Install the GitHub App on it." if source == "app" else
+               "Check its repository access and scopes.")
         result.update(status="no-access", detail=(
-            f"TAP_TOKEN authenticated but cannot read {repo} (HTTP {status}"
-            f"{': ' + message if message else ''}). Check its repository access and scopes."))
+            f"{label[0].upper() + label[1:]} authenticated but cannot read {repo} (HTTP {status}"
+            f"{': ' + message if message else ''}). {fix}"))
         return result
     if status != 200:
-        result.update(status="error", detail=f"Unexpected HTTP {status} while verifying TAP_TOKEN"
+        result.update(status="error", detail=f"Unexpected HTTP {status} while verifying {label}"
                                              f"{': ' + message if message else ''}.")
         return result
 
+    if source == "app":
+        # Installation tokens live for an hour and are re-minted every run: nothing to renew.
+        result["detail"] = "The GitHub App token was minted for this run and can read the tap."
+        return result
     raw_expiry = headers.get("GitHub-Authentication-Token-Expiration")
     if not raw_expiry:
         result["detail"] = "TAP_TOKEN is valid and GitHub reports no expiration date."
@@ -151,7 +184,7 @@ def find_issue(api_url, repo, gh_token):
         page += 1
 
 
-def report_issue(result, api_url, repo, gh_token):
+def report_issue(result, api_url, repo, gh_token, source="pat"):
     """Open/update/close the tracking issue. Returns a short description of the action."""
     if result["status"] == "error":
         return "left tracking issue untouched (transient error)"
@@ -164,7 +197,7 @@ def report_issue(result, api_url, repo, gh_token):
             return "no tracking issue open"
         number = issue["number"]
         api("POST", f"{api_url}/repos/{repo}/issues/{number}/comments", gh_token,
-            {"body": f"TAP_TOKEN preflight passed in {workflow}"
+            {"body": f"Token preflight ({source}) passed in {workflow}"
                      f"{' ([run](' + link + '))' if link else ''}: {result['detail']} Closing."})
         status, _, _ = api("PATCH", f"{api_url}/repos/{repo}/issues/{number}", gh_token,
                            {"state": "closed", "state_reason": "completed"})
@@ -177,7 +210,7 @@ def report_issue(result, api_url, repo, gh_token):
         MARKER, STATUS_MARKER.format(result["status"]), "",
         f"**Status:** `{result['status']}`", "",
         result["detail"], "",
-        RENEW_HINT, "",
+        SOURCES[source]["hint"], "",
         f"Last checked: {now} by {workflow}" + (f" ([run]({link}))" if link else "") + ".", "",
         "This issue is maintained by `scripts/check-token.py`: it is updated in place on each "
         "scheduled run and closed automatically once the token passes the preflight again.",
@@ -224,16 +257,20 @@ def main(argv=None):
                                                          "dl-alexandre/homebrew-tap"))
     parser.add_argument("--report-issue", action="store_true",
                         help="open/update/close a tracking issue using GITHUB_TOKEN")
+    parser.add_argument("--source", choices=sorted(SOURCES),
+                        default=os.environ.get("TOKEN_SOURCE") or "pat",
+                        help="where the token came from: a GitHub App or the TAP_TOKEN PAT")
     args = parser.parse_args(argv)
     api_url = os.environ.get("GITHUB_API_URL", "https://api.github.com").rstrip("/")
+    hint = SOURCES[args.source]["hint"]
 
     result = check(os.environ.get("TAP_TOKEN", ""), api_url, args.repo, args.warn_days,
-                   datetime.now(timezone.utc))
+                   datetime.now(timezone.utc), args.source)
     failed = result["status"] not in ("ok", "expiring")
 
     if failed:
-        print(f"::error title=TAP_TOKEN preflight failed ({result['status']})::"
-              f"{result['detail']} {RENEW_HINT}")
+        print(f"::error title=Token preflight failed ({args.source}: {result['status']})::"
+              f"{result['detail']} {hint}")
     elif result["status"] == "expiring":
         print(f"::warning title=TAP_TOKEN expires soon::{result['detail']}")
     else:
@@ -245,16 +282,17 @@ def main(argv=None):
         try:
             if not gh_token:
                 raise RuntimeError("GITHUB_TOKEN is not set")
-            issue_note = report_issue(result, api_url, args.repo, gh_token)
+            issue_note = report_issue(result, api_url, args.repo, gh_token, args.source)
             print(f"Tracking issue: {issue_note}")
         except (RuntimeError, urllib.error.URLError, OSError, KeyError, TypeError) as err:
             issue_note = f"could not update tracking issue: {err}"
-            print(f"::warning title=TAP_TOKEN tracking issue not updated::{err}")
+            print(f"::warning title=Token tracking issue not updated::{err}")
 
     icon = {"ok": "✅", "expiring": "⚠️"}.get(result["status"], "❌")
-    summary = [f"### {icon} TAP_TOKEN preflight: `{result['status']}`", "", result["detail"]]
+    summary = [f"### {icon} Token preflight ({args.source}): `{result['status']}`", "",
+               result["detail"]]
     if failed or result["status"] == "expiring":
-        summary += ["", RENEW_HINT]
+        summary += ["", hint]
     if issue_note:
         summary += ["", f"Tracking issue: {issue_note}"]
     append("GITHUB_STEP_SUMMARY", "\n".join(summary) + "\n")

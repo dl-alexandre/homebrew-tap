@@ -72,11 +72,22 @@ Every tool tracks `Tools/cli-template`: standard Makefile targets, `ci.yml` (tes
 
 See [GoReleaser Configuration Guide](docs/GORELEASER_GUIDE.md) for the build configuration needed to integrate with formula automation.
 
-### Token permissions
+### Automation token
 
-The `TAP_TOKEN` Actions secret must have access to this tap and every fleet repository, including private tool repositories. Use a classic token with `repo` and `workflow` scopes, or a fine-grained token with repository access and the required contents, pull requests, and Actions permissions:
-- `contents:write` — create branches, commit formula updates, and maintain releases
-- `pull_requests:write` — create pull requests with formula updates
-- `actions:read` — inspect fleet workflow runs
+Scheduled workflows need a token that reaches this tap and every fleet repository, including private tool repositories. They get it from a **GitHub App** that mints a fresh one-hour token on every run, so there is nothing to renew:
 
-Renew the token before it expires and replace it in this repository's Actions secrets. A `401 Bad credentials` response from scheduled jobs means it must be replaced. The health scripts report inaccessible repositories as failures.
+1. Create a GitHub App (Settings > Developer settings > GitHub Apps > New), for example `dl-alexandre-tap-bot`. Disable the webhook and grant these **repository** permissions:
+   - Contents: read and write — branches, formula commits, releases
+   - Pull requests: read and write — formula update PRs
+   - Actions: read — fleet CI health
+   - Metadata: read (always on)
+
+   Nothing else: the tracking issue is filed with the built-in `GITHUB_TOKEN`.
+2. Generate a private key, then install the app on this tap and every fleet repository (or on all repositories).
+3. In this repository's Settings > Secrets and variables > Actions, add the **variable** `TAP_APP_CLIENT_ID` (the app's Client ID; the numeric App ID as `TAP_APP_ID` also works) and the **secret** `TAP_APP_PRIVATE_KEY` (the full `.pem` contents).
+
+Each job mints its token with `actions/create-github-app-token`. PRs opened with it trigger CI, unlike PRs opened with the built-in `GITHUB_TOKEN`. The preflight job in each scheduled workflow (`scripts/check-token.py`) fails fast and keeps one tracking issue open if the app token cannot be minted or cannot read the tap.
+
+**Legacy fallback:** while neither `TAP_APP_CLIENT_ID` nor `TAP_APP_ID` is set, the workflows fall back to the `TAP_TOKEN` personal access token secret (classic `repo` + `workflow` scopes, or fine-grained with contents, pull requests, and Actions access to every fleet repository). The preflight warns 14 days before it expires; a `401 Bad credentials` means it must be replaced. Once the app has run successfully, delete the `TAP_TOKEN` secret.
+
+The health scripts report inaccessible repositories as failures; with the app, that usually means it is not installed on that repository.
