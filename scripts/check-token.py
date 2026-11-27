@@ -3,7 +3,7 @@
 
 The token is either a GitHub App installation token minted for this run by
 actions/create-github-app-token (TOKEN_SOURCE=app, the default once the
-TAP_APP_CLIENT_ID variable is set) or the legacy TAP_TOKEN personal access token
+TAP_APP_CLIENT_ID or TAP_APP_ID variable is set) or the legacy TAP_TOKEN personal access token
 (TOKEN_SOURCE=pat). App tokens are minted fresh each run and never need renewing, so
 the expiry handling below only applies to the PAT fallback.
 
@@ -51,7 +51,7 @@ NEEDS_ATTENTION = ("missing", "invalid", "no-access", "expiring")
 SOURCES = {
     "app": {
         "label": "the GitHub App token",
-        "hint": ("Check the TAP_APP_CLIENT_ID variable and TAP_APP_PRIVATE_KEY secret under "
+        "hint": ("Check the TAP_APP_CLIENT_ID (or TAP_APP_ID) variable and TAP_APP_PRIVATE_KEY secret under "
                  "Settings > Secrets and variables > Actions, and that the GitHub App is "
                  "installed on this tap and every fleet repository."),
     },
