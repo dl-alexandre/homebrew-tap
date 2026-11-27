@@ -27,10 +27,11 @@ Dir.glob("#{formula_dir}/*.rb").sort.each do |formula_file|
 
   begin
     release = client.latest_release(repo)
-    new_version = release.tag_name
-    # Tags are usually v1.2.3; formulas may store either form. Compare
-    # without the prefix so we do not open a daily PR that only adds "v".
-    same_version = new_version.sub(/\Av/, '') == current_version.sub(/\Av/, '')
+    # Homebrew versions omit the tag's conventional leading v. Keep the
+    # original tag separately for release URLs, which still include it.
+    new_tag = release.tag_name
+    new_version = new_tag.sub(/\Av/, '')
+    same_version = new_version == current_version.sub(/\Av/, '')
 
     if same_version
       puts "#{formula} is up to date (#{new_version})"
@@ -46,7 +47,7 @@ Dir.glob("#{formula_dir}/*.rb").sort.each do |formula_file|
     if old_tag
       new_content = new_content.gsub(
         %r{/releases/download/#{Regexp.escape(old_tag)}/},
-        "/releases/download/#{new_version}/"
+        "/releases/download/#{new_tag}/"
       )
 
       old_ver = old_tag.sub(/^v/, '')

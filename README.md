@@ -30,7 +30,7 @@ Meta-repository for the dl-alexandre CLI tool fleet: Homebrew tap, Scoop bucket,
 | [`unifi`](https://github.com/dl-alexandre/Local-UniFi-CLI) | Local-UniFi-CLI | Local UniFi Controller CLI |
 | [`ups`](https://github.com/dl-alexandre/UPS-CLI) | UPS-CLI | UPS shipping CLI |
 | [`usm`](https://github.com/dl-alexandre/UniFi-Site-Manager-CLI) | UniFi-Site-Manager-CLI | UniFi Site Manager CLI |
-| [`x-cli`](https://github.com/dl-alexandre/X-CLI) | X-CLI | X/Twitter CLI (binary release; `x.rb` is a source-build fallback) |
+| [`x-cli`](https://github.com/dl-alexandre/X-CLI) | X-CLI | X/Twitter CLI |
 
 ## Install
 
@@ -52,6 +52,7 @@ The `update-formulas` workflow auto-discovers every `Formula/*.rb` file, reads t
 - `scripts/refresh-dependencies.sh` — normalize Go workflow setup, refresh package and test dependencies, tidy, and test; report any failed step
 - `scripts/check-submodule-pointers.sh` — compare submodule gitlinks with `.gitmodules` branches (`--update` to fast-forward)
 - `scripts/check-formula-coverage.sh` — verify every `Tools/*` submodule has a matching formula
+- `scripts/check-scoop-parity.sh` — verify every Scoop-supported tool has a manifest whose version matches its Homebrew formula (`cli-template` is intentionally omitted)
 - `scripts/check-template-drift.sh` — verify every tool matches the `cli-template` baseline (README, LICENSE, Makefile, CI + release workflows, GoReleaser config, golangci-lint v2 config) and flags `go.mod` Go version outliers
 - `scripts/check-ci-health.sh` / `scripts/check-releases.sh` — fleet-wide CI and release audits
 - `python3 scripts/tests/test_health_checks.py` — regression checks for health reports, including API failures and tap workflows
@@ -59,7 +60,7 @@ The `update-formulas` workflow auto-discovers every `Formula/*.rb` file, reads t
 
 ### Fleet health CI
 
-The weekly `fleet-health` workflow runs CI health checks, release audits, formula coverage validation, and template drift detection.
+The weekly `fleet-health` workflow runs CI health checks, release audits, formula coverage and Scoop parity validation, and template drift detection.
 
 ### Fleet baseline policy
 

@@ -5,7 +5,7 @@
 class Ups < Formula
   desc "UPS CLI - Track packages and manage UPS shipments"
   homepage "https://github.com/dl-alexandre/UPS-CLI"
-  version "v0.0.7"
+  version "0.0.7"
   license "MIT"
 
   on_macos do

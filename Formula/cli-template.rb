@@ -5,7 +5,7 @@
 class CliTemplate < Formula
   desc "Production-ready Go CLI template with Kong, Viper, caching, and GoReleaser"
   homepage "https://github.com/dl-alexandre/cli-template"
-  version "v1.1.4"
+  version "1.1.4"
   license "MIT"
 
   on_macos do
