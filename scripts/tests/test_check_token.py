@@ -102,8 +102,11 @@ class CheckTokenTest(unittest.TestCase):
     def state(self):
         return self.server.state
 
-    def run_check(self, *args, token=SECRET, gh_token=BUILTIN):
-        env = {k: v for k, v in os.environ.items() if not k.startswith("GITHUB_")}
+    def run_check(self, *args, token=SECRET, gh_token=BUILTIN, source=None):
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith("GITHUB_") and k != "TOKEN_SOURCE"}
+        if source:
+            env["TOKEN_SOURCE"] = source
         env.update(GITHUB_API_URL=f"http://127.0.0.1:{self.server.server_address[1]}",
                    GITHUB_REPOSITORY=REPO, GITHUB_REPOSITORY_OWNER="dl-alexandre",
                    GITHUB_RUN_ID="42", GITHUB_WORKFLOW="Update Formulas",
@@ -123,7 +126,7 @@ class CheckTokenTest(unittest.TestCase):
     def test_missing_token_fails_without_calling_github(self):
         result = self.run_check(token="")
         self.assertEqual(result.returncode, 1)
-        self.assertIn("::error title=TAP_TOKEN preflight failed (missing)::", result.stdout)
+        self.assertIn("::error title=Token preflight failed (pat: missing)::", result.stdout)
         self.assertEqual(self.outputs()["status"], "missing")
         self.assertEqual(self.state["calls"], [])
 
@@ -198,7 +201,7 @@ class CheckTokenTest(unittest.TestCase):
         result = subprocess.run([sys.executable, str(SCRIPT)], env=env, text=True,
                                 capture_output=True, timeout=60)
         self.assertEqual(result.returncode, 1)
-        self.assertIn("preflight failed (error)", result.stdout)
+        self.assertIn("preflight failed (pat: error)", result.stdout)
         self.assertNotIn(SECRET, result.stdout + result.stderr)
 
     # Tracking issue -------------------------------------------------------------------
@@ -264,8 +267,53 @@ class CheckTokenTest(unittest.TestCase):
     def test_issue_failure_does_not_mask_token_result(self):
         result = self.run_check("--report-issue", token="ghp_wrong", gh_token="")
         self.assertEqual(result.returncode, 1)
-        self.assertIn("preflight failed (invalid)", result.stdout)
-        self.assertIn("::warning title=TAP_TOKEN tracking issue not updated::", result.stdout)
+        self.assertIn("preflight failed (pat: invalid)", result.stdout)
+        self.assertIn("::warning title=Token tracking issue not updated::", result.stdout)
+
+
+    # GitHub App source ----------------------------------------------------------------
+
+    def test_app_token_ignores_expiry_header(self):
+        # Installation tokens expire within the hour by design; that must never warn.
+        self.state["probe"]["headers"] = expiry_header(0)
+        result = self.run_check(source="app")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertNotIn("::warning", result.stdout)
+        self.assertEqual(self.outputs(), {"status": "ok", "expires_at": "", "days_left": ""})
+        self.assertIn("Token preflight (app): `ok`", self.summary.read_text())
+
+    def test_source_flag_overrides_environment(self):
+        self.state["probe"]["headers"] = expiry_header(1)
+        result = self.run_check("--source", "app", source="pat")
+        self.assertEqual(self.outputs()["status"], "ok", result.stdout)
+
+    def test_failed_app_mint_is_invalid_and_never_calls_github(self):
+        result = self.run_check(source="app", token="")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("::error title=Token preflight failed (app: invalid)::", result.stdout)
+        self.assertIn("Mint GitHub App token", result.stdout)
+        self.assertIn("TAP_APP_PRIVATE_KEY", result.stdout)
+        self.assertEqual(self.state["calls"], [])
+
+    def test_app_not_installed_on_tap_points_at_installation(self):
+        self.state["probe"] = {"status": 404, "message": "Not Found"}
+        result = self.run_check(source="app")
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(self.outputs()["status"], "no-access")
+        self.assertIn("Install the GitHub App", result.stdout)
+
+    def test_app_failure_issue_explains_app_setup_not_pat_renewal(self):
+        self.run_check("--report-issue", source="app", token="")
+        body = self.state["issues"][0]["body"]
+        self.assertIn("TAP_APP_CLIENT_ID", body)
+        self.assertNotIn("Create a new token", body)
+
+    def test_switching_to_app_closes_issue_left_by_dead_pat(self):
+        self.run_check("--report-issue", token="ghp_wrong")
+        result = self.run_check("--report-issue", source="app")
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(self.state["issues"][0]["state"], "closed")
+        self.assertIn("Token preflight (app) passed", self.state["comments"][-1][1])
 
 
 if __name__ == "__main__":

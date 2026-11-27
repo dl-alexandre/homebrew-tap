@@ -17,14 +17,27 @@ defaults:
 
 jobs:
   preflight:
-    name: Verify TAP_TOKEN
+    name: Verify automation token
     runs-on: ubuntu-latest
-    # The built-in GITHUB_TOKEN keeps working when TAP_TOKEN is dead, so it is used
+    # The built-in GITHUB_TOKEN keeps working when the automation token is dead, so it is used
     # to open/update/close the single tracking issue.
     permissions:
       contents: read
       issues: write
     steps:
+    - name: Mint GitHub App token
+      id: app-token
+      # Set the TAP_APP_CLIENT_ID variable to switch from the TAP_TOKEN PAT to the app.
+      if: ${{ vars.TAP_APP_CLIENT_ID != '' }}
+      # Let the preflight below report a failed mint in the tracking issue.
+      continue-on-error: true
+      uses: actions/create-github-app-token@v3
+      with:
+        client-id: ${{ vars.TAP_APP_CLIENT_ID }}
+        private-key: ${{ secrets.TAP_APP_PRIVATE_KEY }}
+        # Every repository the app is installed on under this owner, not just the tap.
+        owner: ${{ github.repository_owner }}
+
     - name: Checkout scripts
       uses: actions/checkout@v7
       with:
@@ -33,9 +46,11 @@ jobs:
         sparse-checkout-cone-mode: false
         persist-credentials: false
 
-    - name: Check TAP_TOKEN is accepted and not about to expire
+    - name: Check the automation token works (and the PAT is not about to expire)
       env:
-        TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+        TOKEN_SOURCE: ${{ vars.TAP_APP_CLIENT_ID != '' && 'app' || 'pat' }}
+        # Once the app is configured, a failed mint must not silently fall back to the PAT.
+        TAP_TOKEN: ${{ steps.app-token.outputs.token || (vars.TAP_APP_CLIENT_ID == '' && secrets.TAP_TOKEN || '') }}
         GITHUB_TOKEN: ${{ github.token }}
       run: python3 scripts/check-token.py --warn-days 14 --report-issue
 
@@ -44,6 +59,17 @@ jobs:
     needs: preflight
     runs-on: ubuntu-latest
     steps:
+    - name: Mint GitHub App token
+      id: app-token
+      # Set the TAP_APP_CLIENT_ID variable to switch from the TAP_TOKEN PAT to the app.
+      if: ${{ vars.TAP_APP_CLIENT_ID != '' }}
+      uses: actions/create-github-app-token@v3
+      with:
+        client-id: ${{ vars.TAP_APP_CLIENT_ID }}
+        private-key: ${{ secrets.TAP_APP_PRIVATE_KEY }}
+        # Every repository the app is installed on under this owner, not just the tap.
+        owner: ${{ github.repository_owner }}
+
     - name: Checkout scripts
       uses: actions/checkout@v7
       with:
@@ -54,7 +80,7 @@ jobs:
 
     - name: Check for failed CI runs in the last 7 days
       env:
-        GH_TOKEN: ${{ secrets.TAP_TOKEN }}
+        GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.TAP_TOKEN }}
       run: |
         ./scripts/check-ci-health.sh --days 7 --failed-only
 
@@ -63,6 +89,17 @@ jobs:
     needs: preflight
     runs-on: ubuntu-latest
     steps:
+    - name: Mint GitHub App token
+      id: app-token
+      # Set the TAP_APP_CLIENT_ID variable to switch from the TAP_TOKEN PAT to the app.
+      if: ${{ vars.TAP_APP_CLIENT_ID != '' }}
+      uses: actions/create-github-app-token@v3
+      with:
+        client-id: ${{ vars.TAP_APP_CLIENT_ID }}
+        private-key: ${{ secrets.TAP_APP_PRIVATE_KEY }}
+        # Every repository the app is installed on under this owner, not just the tap.
+        owner: ${{ github.repository_owner }}
+
     - name: Checkout scripts
       uses: actions/checkout@v7
       with:
@@ -73,7 +110,7 @@ jobs:
 
     - name: Check for stale drafts and release anomalies
       env:
-        GH_TOKEN: ${{ secrets.TAP_TOKEN }}
+        GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.TAP_TOKEN }}
       run: |
         ./scripts/check-releases.sh
 
@@ -98,11 +135,22 @@ jobs:
     name: Check Scoop Parity
     runs-on: ubuntu-latest
     steps:
+    - name: Mint GitHub App token
+      id: app-token
+      # Set the TAP_APP_CLIENT_ID variable to switch from the TAP_TOKEN PAT to the app.
+      if: ${{ vars.TAP_APP_CLIENT_ID != '' }}
+      uses: actions/create-github-app-token@v3
+      with:
+        client-id: ${{ vars.TAP_APP_CLIENT_ID }}
+        private-key: ${{ secrets.TAP_APP_PRIVATE_KEY }}
+        # Every repository the app is installed on under this owner, not just the tap.
+        owner: ${{ github.repository_owner }}
+
     - name: Checkout repository with packaging submodules
       uses: actions/checkout@v7
       with:
         submodules: true
-        token: ${{ secrets.TAP_TOKEN }}
+        token: ${{ steps.app-token.outputs.token || secrets.TAP_TOKEN }}
 
     - name: Verify Scoop manifests match Homebrew formula versions
       run: |
@@ -113,12 +161,23 @@ jobs:
     needs: preflight
     runs-on: ubuntu-latest
     steps:
+    - name: Mint GitHub App token
+      id: app-token
+      # Set the TAP_APP_CLIENT_ID variable to switch from the TAP_TOKEN PAT to the app.
+      if: ${{ vars.TAP_APP_CLIENT_ID != '' }}
+      uses: actions/create-github-app-token@v3
+      with:
+        client-id: ${{ vars.TAP_APP_CLIENT_ID }}
+        private-key: ${{ secrets.TAP_APP_PRIVATE_KEY }}
+        # Every repository the app is installed on under this owner, not just the tap.
+        owner: ${{ github.repository_owner }}
+
     - name: Checkout repository with tool submodules
       uses: actions/checkout@v7
       with:
         submodules: true
         # Some tool repos are private; the default GITHUB_TOKEN cannot clone them.
-        token: ${{ secrets.TAP_TOKEN }}
+        token: ${{ steps.app-token.outputs.token || secrets.TAP_TOKEN }}
 
     - name: Verify tools match the cli-template baseline
       run: |
