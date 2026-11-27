@@ -11,9 +11,37 @@ on:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
+  preflight:
+    name: Verify TAP_TOKEN
+    runs-on: ubuntu-latest
+    # The built-in GITHUB_TOKEN keeps working when TAP_TOKEN is dead, so it is used
+    # to open/update/close the single tracking issue.
+    permissions:
+      contents: read
+      issues: write
+    steps:
+    - name: Checkout scripts
+      uses: actions/checkout@v7
+      with:
+        sparse-checkout: |
+          scripts/
+        sparse-checkout-cone-mode: false
+        persist-credentials: false
+
+    - name: Check TAP_TOKEN is accepted and not about to expire
+      env:
+        TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
+      run: python3 scripts/check-token.py --warn-days 14 --report-issue
+
   ci-health:
     name: Check CI Health
+    needs: preflight
     runs-on: ubuntu-latest
     steps:
     - name: Checkout scripts
@@ -32,6 +60,7 @@ jobs:
 
   release-audit:
     name: Audit Releases
+    needs: preflight
     runs-on: ubuntu-latest
     steps:
     - name: Checkout scripts
@@ -81,6 +110,7 @@ jobs:
 
   template-drift:
     name: Check Template Drift
+    needs: preflight
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository with tool submodules

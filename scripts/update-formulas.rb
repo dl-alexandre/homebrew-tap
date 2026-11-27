@@ -6,6 +6,7 @@ require 'digest'
 
 client = Octokit::Client.new(access_token: ENV['GITHUB_TOKEN'])
 updated = []
+errors = []
 formula_dir = ENV.fetch('FORMULA_DIR', 'Formula')
 
 Dir.glob("#{formula_dir}/*.rb").sort.each do |formula_file|
@@ -82,17 +83,18 @@ Dir.glob("#{formula_dir}/*.rb").sort.each do |formula_file|
     updated << { formula: formula, version: new_version, repo: repo }
   rescue StandardError => e
     puts "Error processing #{repo}: #{e.message}"
+    errors << "#{formula} (#{repo}): #{e.message}"
   end
 end
 
 if updated.any?
   branch_name = "update-formulas-#{Time.now.strftime('%Y%m%d-%H%M%S')}"
-  system('git', 'checkout', '-b', branch_name)
-  system('git', 'add', "#{formula_dir}/")
+  system('git', 'checkout', '-b', branch_name, exception: true)
+  system('git', 'add', "#{formula_dir}/", exception: true)
 
   commit_message = updated.map { |u| "#{u[:formula]}: #{u[:version]}" }.join("\n")
-  system('git', 'commit', '-m', "Update formulas\n\n#{commit_message}")
-  system('git', 'push', 'origin', branch_name)
+  system('git', 'commit', '-m', "Update formulas\n\n#{commit_message}", exception: true)
+  system('git', 'push', 'origin', branch_name, exception: true)
 
   pr_body = updated.map do |u|
     "- **#{u[:formula]}**: #{u[:version]} ([#{u[:repo]}](https://github.com/#{u[:repo]}/releases))"
@@ -115,5 +117,13 @@ if updated.any?
   puts "Created PR for #{updated.length} formula(s)"
 else
   File.open(ENV['GITHUB_OUTPUT'], 'a') { |f| f.puts 'pr_created=false' }
-  puts 'All formulas are up to date'
+  puts 'All formulas are up to date' if errors.empty?
+end
+
+# A lookup failure (bad token, lost repo access, API outage) must not be reported as
+# "up to date": fail the job after any successful updates have been proposed.
+unless errors.empty?
+  warn "::error title=Formula update lookups failed::#{errors.length} formula(s) could not be checked"
+  errors.each { |e| warn "  #{e}" }
+  exit 1
 end
