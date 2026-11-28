@@ -23,7 +23,7 @@ jobs:
   preflight:
     name: Verify automation token
     runs-on: ubuntu-latest
-    # The built-in GITHUB_TOKEN keeps working when the automation token is dead, so it is used
+    # The built-in GITHUB_TOKEN keeps working when the app token cannot be minted, so it is used
     # to open/update/close the single tracking issue.
     permissions:
       contents: read
@@ -31,8 +31,6 @@ jobs:
     steps:
     - name: Mint GitHub App token
       id: app-token
-      # Set TAP_APP_CLIENT_ID (or TAP_APP_ID) to switch from the TAP_TOKEN PAT to the app.
-      if: ${{ (vars.TAP_APP_CLIENT_ID || vars.TAP_APP_ID) != '' }}
       # Let the preflight below report a failed mint in the tracking issue.
       continue-on-error: true
       uses: actions/create-github-app-token@v3
@@ -51,13 +49,12 @@ jobs:
         sparse-checkout-cone-mode: false
         persist-credentials: false
 
-    - name: Check the automation token works (and the PAT is not about to expire)
+    - name: Check the GitHub App token works
       env:
-        TOKEN_SOURCE: ${{ (vars.TAP_APP_CLIENT_ID || vars.TAP_APP_ID) != '' && 'app' || 'pat' }}
-        # Once the app is configured, a failed mint must not silently fall back to the PAT.
-        TAP_TOKEN: ${{ steps.app-token.outputs.token || ((vars.TAP_APP_CLIENT_ID || vars.TAP_APP_ID) == '' && secrets.TAP_TOKEN || '') }}
+        # Empty when the mint above failed; the script then reports `invalid`.
+        APP_TOKEN: ${{ steps.app-token.outputs.token }}
         GITHUB_TOKEN: ${{ github.token }}
-      run: python3 scripts/check-token.py --warn-days 14 --report-issue
+      run: python3 scripts/check-token.py --report-issue
 
   update-formulas:
     needs: preflight
@@ -68,8 +65,6 @@ jobs:
     steps:
     - name: Mint GitHub App token
       id: app-token
-      # Set TAP_APP_CLIENT_ID (or TAP_APP_ID) to switch from the TAP_TOKEN PAT to the app.
-      if: ${{ (vars.TAP_APP_CLIENT_ID || vars.TAP_APP_ID) != '' }}
       uses: actions/create-github-app-token@v3
       with:
         # The action accepts either the Client ID or the numeric App ID here.
@@ -82,7 +77,7 @@ jobs:
       uses: actions/checkout@v7
       with:
         # Pushes the formula branch; PRs opened with this token (unlike GITHUB_TOKEN) trigger CI.
-        token: ${{ steps.app-token.outputs.token || secrets.TAP_TOKEN }}
+        token: ${{ steps.app-token.outputs.token }}
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
@@ -101,7 +96,7 @@ jobs:
     - name: Update formulas
       id: update
       env:
-        GITHUB_TOKEN: ${{ steps.app-token.outputs.token || secrets.TAP_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         TAP_REPO: dl-alexandre/homebrew-tap
         TAP_BRANCH: master
       run: ruby scripts/update-formulas.rb
@@ -119,8 +114,6 @@ jobs:
     steps:
     - name: Mint GitHub App token
       id: app-token
-      # Set TAP_APP_CLIENT_ID (or TAP_APP_ID) to switch from the TAP_TOKEN PAT to the app.
-      if: ${{ (vars.TAP_APP_CLIENT_ID || vars.TAP_APP_ID) != '' }}
       uses: actions/create-github-app-token@v3
       with:
         # The action accepts either the Client ID or the numeric App ID here.
@@ -144,7 +137,7 @@ jobs:
 
     - name: Discover and test formulas
       env:
-        GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.TAP_TOKEN }}
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
         TEST_REF: ${{ needs.update-formulas.outputs.branch_name || github.ref }}
       run: |
         git fetch origin "$TEST_REF"

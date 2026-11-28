@@ -84,10 +84,8 @@ Scheduled workflows need a token that reaches this tap and every fleet repositor
 
    Nothing else: the tracking issue is filed with the built-in `GITHUB_TOKEN`.
 2. Generate a private key, then install the app on this tap and every fleet repository (or on all repositories).
-3. In this repository's Settings > Secrets and variables > Actions, add the **variable** `TAP_APP_CLIENT_ID` (the app's Client ID; the numeric App ID as `TAP_APP_ID` also works) and the **secret** `TAP_APP_PRIVATE_KEY` (the full `.pem` contents).
+3. In this repository's Settings > Secrets and variables > Actions, add the **variable** `TAP_APP_ID` (the numeric App ID) or `TAP_APP_CLIENT_ID` (the app's Client ID; it wins if both are set) and the **secret** `TAP_APP_PRIVATE_KEY` (the full `.pem` contents).
 
 Each job mints its token with `actions/create-github-app-token`. PRs opened with it trigger CI, unlike PRs opened with the built-in `GITHUB_TOKEN`. The preflight job in each scheduled workflow (`scripts/check-token.py`) fails fast and keeps one tracking issue open if the app token cannot be minted or cannot read the tap.
-
-**Legacy fallback:** while neither `TAP_APP_CLIENT_ID` nor `TAP_APP_ID` is set, the workflows fall back to the `TAP_TOKEN` personal access token secret (classic `repo` + `workflow` scopes, or fine-grained with contents, pull requests, and Actions access to every fleet repository). The preflight warns 14 days before it expires; a `401 Bad credentials` means it must be replaced. Once the app has run successfully, delete the `TAP_TOKEN` secret.
 
 The health scripts report inaccessible repositories as failures; with the app, that usually means it is not installed on that repository.
